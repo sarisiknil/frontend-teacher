@@ -1,0 +1,175 @@
+/* ===============================
+   VERIFY PAGE WRAPPER
+================================ */
+.verify-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100%;
+  background: #f8fafc;
+  font-family: "Inter", sans-serif;
+  padding: 1rem;
+}
+
+/* ===============================
+   VERIFY CARD
+================================ */
+.verify-card {
+  width: 420px;
+  max-width: 100%;
+  background: #ffffff;
+  padding: 2.5rem 2rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===============================
+   TITLES & TEXT
+================================ */
+.verify-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #111827;
+  text-align: center;
+  margin-bottom: 0.8rem;
+}
+
+.verify-sub {
+  text-align: center;
+  color: #4b5563;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+}
+
+.pill {
+  background: #eef2ff;
+  color: #4338ca;
+  padding: 0.25rem 0.55rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ===============================
+   FORM
+================================ */
+.verify-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+}
+
+.label {
+  color: #374151;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: -0.3rem;
+}
+
+/* Verification input */
+.token-input {
+  padding: 0.85rem 1rem;
+  font-size: 1.05rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 10px;
+  background: #f9fafb;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.token-input:focus {
+  border-color: #6366f1;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+/* ===============================
+   VERIFY BUTTON
+================================ */
+.verify-btn {
+  margin-top: 0.5rem;
+  padding: 0.85rem 1rem;
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  background: #4f46e5;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.verify-btn:hover {
+  background: #4338ca;
+}
+
+.verify-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* ===============================
+   MOCK CODE ROW (DEV ONLY)
+================================ */
+.mock-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f3f4f6;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  margin-top: 0.4rem;
+}
+
+.muted {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.code {
+  background: #e5e7eb;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+.link-btn {
+  color: #4f46e5;
+  font-size: 0.85rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
+
+/* ===============================
+   MESSAGE (Error or Success)
+================================ */
+.message {
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  background: #fee2e2;
+  border-left: 4px solid #dc2626;
+  border-radius: 10px;
+  color: #b91c1c;
+  font-size: 0.9rem;
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

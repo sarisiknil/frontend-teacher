@@ -1,8 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-// --------------------
-//  AUTH CONFIG
-// --------------------
 type TokenProvider = () => string | null;
 
 let getToken: TokenProvider = () => null;
@@ -19,9 +16,6 @@ export function configureApiAuth(opts: {
   refreshSession = opts.refreshSession ?? null;
 }
 
-// --------------------
-//  HELPERS
-// --------------------
 function json(body: object): RequestInit {
   return {
     method: "POST",
@@ -110,9 +104,6 @@ export async function apiFetch<T>(
   return response.json();
 }
 
-// --------------------
-//  API ENDPOINTS
-// --------------------
 export type LoginResponse = {
   message: string;
   mock: string;
@@ -224,6 +215,15 @@ export const changePassword = (
     new_password,
   });
 
+export const logoutRequest = (
+  old_access_token: string,
+  refresh_token: string
+) =>
+  apiPost("/api/authenticate/logout", {
+    old_access_token,
+    refresh_token,
+  });
+
 // --------------------
 //  WRAPPER
 // --------------------
@@ -233,4 +233,80 @@ export function apiPost<T>(
   opts: { requireAuth?: boolean } = {}
 ): Promise<T> {
   return apiFetch<T>(`${API_BASE}${path}`, json(body), opts);
+}
+export interface LookupResponse {
+  user_id: string;
+}
+export const userLookup = (
+  identifier: string,
+  user_type: "TEACHER"
+): Promise<LookupResponse> => {
+  return apiPost("/api/authenticate/user/lookup", {
+    identifier,
+    user_type,
+  });
+};
+
+export interface UserInfoResponse {
+  user_id: string;
+  phone_number: string;
+  email: string;
+  user_type: "TEACHER" ;
+}
+
+export function getUserInfo(
+  user_id: string
+): Promise<UserInfoResponse> {
+  return apiFetch<UserInfoResponse>(
+    `${API_BASE}/api/authenticate/user/${user_id}`,
+    {
+      method: "GET",
+    },
+    { requireAuth: true }
+  );
+}
+export function apiGet<T>(
+  path: string,
+  params: Record<string, string | number> = {},
+  opts: { requireAuth?: boolean } = {}
+): Promise<T> {
+  const query = new URLSearchParams(params as Record<string, string>).toString();
+  const url = `${API_BASE}${path}${query ? `?${query}` : ""}`;
+
+  return apiFetch<T>(
+    url,
+    { method: "GET" },
+    opts
+  );
+}
+
+
+export function apiPatch<T>(
+  path: string,
+  body: object,
+  opts: { requireAuth?: boolean } = {}
+): Promise<T> {
+  return apiFetch<T>(
+    `${API_BASE}${path}`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+    opts
+  );
+}
+export function apiPatchForm<T>(
+  path: string,
+  form: FormData,
+  opts: { requireAuth?: boolean } = {}
+): Promise<T> {
+  return apiFetch<T>(
+    `${API_BASE}${path}`,
+    {
+      method: "PATCH",
+      body: form, // let browser set boundary / headers
+    },
+    opts
+  );
 }

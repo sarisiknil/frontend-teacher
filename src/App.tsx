@@ -1,4 +1,4 @@
-import { Routes, Route} from "react-router-dom";
+import { Routes, Route, Outlet} from "react-router-dom";
 import './App.css'
 import LandingPage from './pages/LandingPage';
 import Login from "./pages/Login";
@@ -7,6 +7,9 @@ import VerifyPage from "./pages/VerifyPage";
 import Layout from "./Layout";
 import RequireAuth from "./RequireAuth";
 import Home from "./pages/HomePage";
+import { ProfileProvider } from "./contexts/ProfileContext";
+import ProfileSetupModal from "./modals/ProfileSetupModal";
+import Profile from "./pages/ProfilePage";
 
 function App() {
 
@@ -20,8 +23,20 @@ function App() {
       </Route>
 
       <Route element={<RequireAuth />}>
-        <Route path="/home" element={<Home />} />
+        <Route
+          element={
+            <ProfileProvider>
+              <ProfileSetupModal />
+              <Outlet />
+            </ProfileProvider>
+          }
+        >
+          <Route path="/home" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
+        </Route>
       </Route>
+
+
     </Routes>
   )
 }

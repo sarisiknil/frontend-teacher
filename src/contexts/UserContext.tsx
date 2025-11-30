@@ -1,50 +1,68 @@
 // src/contexts/UserContext.tsx
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { refreshRequest } from "../Api";
+import { getUserInfo, logoutRequest, refreshRequest, userLookup } from "../Api";
+import { configureApiAuth } from "../Api";
 
 export type Session = {
   access_token: string;
   refresh_token: string;
-  expiration: number; // absolute timestamp in ms
+  expiration: number;
+  identifier: string;
 };
 
 export type UserContextType = {
   session: Session | null;
   isLoading: boolean;
+  userInfo: UserInfo | null;
   isAuthenticated: boolean;
-  login: (s: { access_token: string; refresh_token: string; expiration: number }) => void;
-  logout: () => void;
+  login: (s: { access_token: string; refresh_token: string; expiration: number; identifier: string }) => void;
+  logout: () => Promise<void>;
   getAccessToken: () => string | null;
   refreshSession: () => Promise<boolean>;
 };
 
-const STORAGE_KEY = "app_session_v1";
+export interface UserInfo {
+  user_id: string;
+  phone_number: string;
+  email: string;
+  user_type: "TEACHER";
+}
 
+const STORAGE_KEY = "app_session_v1";
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
-  // -------- Login --------
-  const login = (s: { access_token: string; refresh_token: string; expiration: number }) => {
+  // ---------------- LOGIN ----------------
+  const login = (s: { access_token: string; refresh_token: string; expiration: number; identifier: string }) => {
     const normalized: Session = {
       access_token: s.access_token,
       refresh_token: s.refresh_token,
-      expiration: Date.now() + s.expiration * 60 * 1000, // minutes → ms
+      expiration: Date.now() + s.expiration * 60 * 1000,
+      identifier: s.identifier,
     };
 
     setSession(normalized);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
   };
 
-  // -------- Logout --------
-  const logout = () => {
+  // ---------------- LOGOUT ----------------
+  const logout = async () => {
+    try {
+      if (session) {
+        await logoutRequest(session.access_token, session.refresh_token);
+      }
+    } catch (err) {
+      console.warn("Logout request failed:", err);
+    }
     setSession(null);
     localStorage.removeItem(STORAGE_KEY);
   };
 
-  // -------- Refresh Token --------
+  // ---------------- REFRESH TOKEN ----------------
   const refreshSession = async (): Promise<boolean> => {
     if (!session) return false;
 
@@ -55,6 +73,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         access_token: res.access_token,
         refresh_token: res.refresh_token ?? session.refresh_token,
         expiration: Date.now() + res.expiration * 60 * 1000,
+        identifier: session.identifier,
       };
 
       setSession(updated);
@@ -62,22 +81,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
       return true;
     } catch {
-      logout();
+      await logout();
       return false;
     }
   };
 
-  // -------- Access Token Getter --------
   const getAccessToken = () => session?.access_token ?? null;
 
-  // -------- Restore from LocalStorage --------
+  // ---------------- RESTORE FROM LOCAL STORAGE ----------------
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
+
       if (raw) {
         const parsed: Session = JSON.parse(raw);
 
-        // expired?
         if (parsed.expiration > Date.now()) {
           setSession(parsed);
         } else {
@@ -91,9 +109,41 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
   }, []);
 
+  // ---------------- LOAD USER INFO ----------------
+  useEffect(() => {
+    if (!session?.identifier) {
+      setUserInfo(null);
+      return;
+    }
+    const safeSession = session;
+    async function loadUserInfo() {
+      try {
+        const lookup = await userLookup(safeSession.identifier, "TEACHER");
+        const full = await getUserInfo(lookup.user_id);
+        setUserInfo(full);
+      } catch (err) {
+        console.error("user lookup failed", err);
+      }
+    }
+
+    loadUserInfo();
+  }, [session]);
+
+
+
+  useEffect(() => {
+    configureApiAuth({
+      getAccessToken,
+      onUnauthorized: logout,
+      refreshSession,
+    });
+  }, [session]); // re-run when token changes
+
+  // ---------------- CONTEXT VALUE ----------------
   const value = useMemo(
     () => ({
       session,
+      userInfo,
       isLoading,
       isAuthenticated: !!session,
       login,
@@ -101,7 +151,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       getAccessToken,
       refreshSession,
     }),
-    [session, isLoading]
+    [session, userInfo, isLoading]
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

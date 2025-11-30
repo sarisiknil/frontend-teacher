@@ -47,7 +47,6 @@ export default function LoginPage() {
 
   return (
     <div className="auth">
-      <div className="hero" aria-hidden />
 
       <div className="card">
         <h2>LOGIN</h2>

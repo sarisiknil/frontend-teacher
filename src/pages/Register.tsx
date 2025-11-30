@@ -73,7 +73,6 @@ export default function RegisterPage() {
 
   return (
     <div className="auth">
-      <div className="hero" aria-hidden />
 
       <div className="card fade-in">
         <h2>Create your account</h2>

@@ -83,6 +83,7 @@ export default function VerifyPage() {
           access_token: res.access_token,
           refresh_token: res.refresh_token,
           expiration: res.expiration,
+          identifier: phone_number,
         });
 
         navigate("/home", { replace: true });

@@ -1,7 +1,7 @@
 // src/contexts/UserContext.tsx
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { getUserInfo, logoutRequest, refreshRequest, userLookup } from "../Api";
-import { configureApiAuth } from "../Api";
+import { getUserInfo, logoutRequest, refreshRequest, userLookup } from "../api/Api";
+import { configureApiAuth } from "../api/Api";
 
 export type Session = {
   access_token: string;

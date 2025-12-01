@@ -3,6 +3,8 @@ import { useProfile } from "../contexts/ProfileContext";
 import Modal from "../components/Modal";
 import "./ProfileSetupModal.css";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 export default function ProfileSetupModal() {
   const {
     needsProfileSetup,
@@ -49,27 +51,38 @@ export default function ProfileSetupModal() {
   const update = (field: string, value: string) =>
     setForm((f) => ({ ...f, [field]: value }));
 
+
+  // ------------------------
+  //  RENDER
+  // ------------------------
   return (
     <Modal title="Complete Your Profile" closable={false}>
       <div className="profile-setup-container">
 
-        {/* Profile Picture Upload */}
+        {/* Avatar Upload */}
         <div className="profile-pic-wrapper">
-          <label htmlFor="avatar-input" className="profile-pic-label">
+          <div
+            className="profile-pic-label"
+            onClick={() => document.getElementById("avatar-setup-input")?.click()}
+          >
             <img
               className="profile-pic"
               src={
                 avatarFile
                   ? URL.createObjectURL(avatarFile)
-                  : profile?.avatar_link || "/default-avatar.png"
+                  : profile?.avatar_link
+                    ? `${API_BASE}/${profile.avatar_link}`
+                    : "/default-avatar.png"
               }
               alt="avatar"
             />
-            <div className="profile-pic-overlay">Change</div>
-          </label>
 
+            <div className="profile-pic-overlay">Change</div>
+          </div>
+
+          {/* Hidden file input */}
           <input
-            id="avatar-input"
+            id="avatar-setup-input"
             type="file"
             accept="image/*"
             className="profile-file-input"
@@ -79,7 +92,7 @@ export default function ProfileSetupModal() {
           />
         </div>
 
-        {/* Inputs */}
+        {/* Form Inputs */}
         <div className="profile-setup-wrapper">
           <input
             className="profile-setup-input"
@@ -101,7 +114,7 @@ export default function ProfileSetupModal() {
           />
           <input
             className="profile-setup-input"
-            placeholder="Teaching Year"
+            placeholder="First Teaching Year"
             value={form.first_teaching_year}
             onChange={(e) => update("first_teaching_year", e.target.value)}
           />
@@ -111,6 +124,7 @@ export default function ProfileSetupModal() {
             value={form.primary_branch}
             onChange={(e) => update("primary_branch", e.target.value)}
           />
+
           <textarea
             className="profile-setup-textarea"
             placeholder="Biography"

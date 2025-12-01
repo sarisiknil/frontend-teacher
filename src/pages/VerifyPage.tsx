@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { authenticateRequest, changeVerifyRequest } from "../Api";
+import { authenticateRequest, changeVerifyRequest } from "../api/Api";
 import "./VerifyPage.css";
 import { useUser } from "../contexts/UserContext";
 

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useProfile } from "../contexts/ProfileContext";
 import "./ProfilePage.css";
-import { getLevels, readChildSubbranches } from "../api/ProfileApi";
-import type { Level, Subbranch } from "../api/ProfileApi";
+import { getLevels, readChildSubbranches } from "../api/CourseApi";
+import type { Level, Subbranch } from "../api/CourseApi";
 
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;

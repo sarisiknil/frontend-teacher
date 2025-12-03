@@ -3,7 +3,6 @@ import { useProfile } from "../contexts/ProfileContext";
 import Modal from "../components/Modal";
 import "./ProfileSetupModal.css";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export default function ProfileSetupModal() {
   const {
@@ -11,9 +10,11 @@ export default function ProfileSetupModal() {
     profile,
     updateProfile,
     updateTeacher,
-    updatePicture,
   } = useProfile();
 
+  // --------------------------
+  // FORM STATE
+  // --------------------------
   const [form, setForm] = useState({
     name: profile?.name ?? "",
     surname: profile?.surname ?? "",
@@ -23,9 +24,10 @@ export default function ProfileSetupModal() {
     biography: "",
   });
 
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [submitted, setSubmitted] = useState(false);
+  const update = (field: string, value: string) =>
+    setForm((f) => ({ ...f, [field]: value }));
 
+  const [submitted, setSubmitted] = useState(false);
   if (!needsProfileSetup || submitted) return null;
 
   async function handleSubmit() {
@@ -41,93 +43,47 @@ export default function ProfileSetupModal() {
       biography: form.biography,
     });
 
-    if (avatarFile) {
-      await updatePicture(avatarFile);
-    }
 
-    setSubmitted(true); // modal closes
+    setSubmitted(true);
   }
-
-  const update = (field: string, value: string) =>
-    setForm((f) => ({ ...f, [field]: value }));
-
-
-  // ------------------------
-  //  RENDER
-  // ------------------------
   return (
-    <Modal title="Complete Your Profile" closable={false}>
+    <Modal title="Profilinizi Tamamlayın" closable={false}>
       <div className="profile-setup-container">
 
-        {/* Avatar Upload */}
-        <div className="profile-pic-wrapper">
-          <div
-            className="profile-pic-label"
-            onClick={() => document.getElementById("avatar-setup-input")?.click()}
-          >
-            <img
-              className="profile-pic"
-              src={
-                avatarFile
-                  ? URL.createObjectURL(avatarFile)
-                  : profile?.avatar_link
-                    ? `${API_BASE}/${profile.avatar_link}`
-                    : "/default-avatar.png"
-              }
-              alt="avatar"
-            />
-
-            <div className="profile-pic-overlay">Change</div>
-          </div>
-
-          {/* Hidden file input */}
-          <input
-            id="avatar-setup-input"
-            type="file"
-            accept="image/*"
-            className="profile-file-input"
-            onChange={(e) => {
-              if (e.target.files?.[0]) setAvatarFile(e.target.files[0]);
-            }}
-          />
-        </div>
-
-        {/* Form Inputs */}
+        {/* FORM */}
         <div className="profile-setup-wrapper">
+
           <input
             className="profile-setup-input"
-            placeholder="Name"
+            placeholder="İsim"
             value={form.name}
             onChange={(e) => update("name", e.target.value)}
           />
+
           <input
             className="profile-setup-input"
-            placeholder="Surname"
+            placeholder="Soyisim"
             value={form.surname}
             onChange={(e) => update("surname", e.target.value)}
           />
+
           <input
-            className="profile-setup-input"
             type="date"
+            className="profile-setup-input"
             value={form.birth_date}
             onChange={(e) => update("birth_date", e.target.value)}
           />
+
           <input
             className="profile-setup-input"
-            placeholder="First Teaching Year"
+            placeholder="Öğretmenliğe başlama tarihiniz"
             value={form.first_teaching_year}
             onChange={(e) => update("first_teaching_year", e.target.value)}
-          />
-          <input
-            className="profile-setup-input"
-            placeholder="Primary Branch"
-            value={form.primary_branch}
-            onChange={(e) => update("primary_branch", e.target.value)}
           />
 
           <textarea
             className="profile-setup-textarea"
-            placeholder="Biography"
+            placeholder="Hakkınızda"
             value={form.biography}
             onChange={(e) => update("biography", e.target.value)}
           />
@@ -135,6 +91,7 @@ export default function ProfileSetupModal() {
           <button className="profile-setup-btn" onClick={handleSubmit}>
             Save
           </button>
+
         </div>
       </div>
     </Modal>

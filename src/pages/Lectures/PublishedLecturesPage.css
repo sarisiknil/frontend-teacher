@@ -1,0 +1,39 @@
+.published-page {
+  width: 100%;
+  padding: 30px;
+}
+
+.published-header {
+  margin-top: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.create-btn {
+  background: #6a5acd;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.create-btn:hover {
+  background: #5847d1;
+}
+
+.published-course-list {
+  margin-top: 20px;
+}
+
+.empty-state {
+  padding: 20px;
+  text-align: center;
+  color: #777;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+}

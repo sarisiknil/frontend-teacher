@@ -1,5 +1,6 @@
-import { Routes, Route, Outlet} from "react-router-dom";
+import { Routes, Route, Outlet } from "react-router-dom";
 import './App.css'
+
 import LandingPage from './pages/LandingPage';
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -7,14 +8,34 @@ import VerifyPage from "./pages/VerifyPage";
 import Layout from "./Layout";
 import RequireAuth from "./RequireAuth";
 import Home from "./pages/HomePage";
+
 import { ProfileProvider } from "./contexts/ProfileContext";
 import ProfileSetupModal from "./modals/ProfileSetupModal";
 import Profile from "./pages/ProfilePage";
 
-function App() {
+import MyLecturesPage from "./pages/Lectures/MyLecturesPage";
+import PublishedLecturesPage from "./pages/Lectures/PublishedTab";
+import UnpublishedLecturesPage from "./pages/Lectures/UnpublishedTab";
+
+import { CourseProvider } from "./contexts/CourseContext";
+import CoursePage from "./pages/Courses/CoursePage";
+import { useParams } from "react-router-dom";
+
+function CourseProviderWrapper() {
+  const { courseId } = useParams();
+  if (!courseId) return <div>Invalid course id</div>;
 
   return (
+    <CourseProvider courseId={courseId}>
+      <CoursePage />
+    </CourseProvider>
+  );
+}
+
+function App() {
+  return (
     <Routes>
+      {/* Public routes */}
       <Route element={<Layout />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
@@ -22,6 +43,7 @@ function App() {
         <Route path="/register" element={<Register />} />
       </Route>
 
+      {/* Protected routes */}
       <Route element={<RequireAuth />}>
         <Route
           element={
@@ -31,14 +53,19 @@ function App() {
             </ProfileProvider>
           }
         >
+          <Route path="/my-lectures" element={<MyLecturesPage />} />
+          <Route path="/my-lectures/unpublished" element={<UnpublishedLecturesPage />} />
+          <Route path="/my-lectures/published" element={<PublishedLecturesPage />} />
+
+          {/* NEW COURSE PAGE ROUTE */}
+          <Route path="/course/:courseId" element={<CourseProviderWrapper />} />
+
           <Route path="/home" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
       </Route>
-
-
     </Routes>
-  )
+  );
 }
 
-export default App
+export default App;

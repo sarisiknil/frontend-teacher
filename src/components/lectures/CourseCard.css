@@ -1,0 +1,88 @@
+.course-card {
+  width: 100%;
+  background: white;
+  border: 1px solid #ececec;
+  border-radius: 10px;
+  padding: 18px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: 0.2s ease;
+  margin-bottom: 14px;
+  cursor: pointer;
+}
+
+.course-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.course-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.course-meta {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.course-date {
+  color: #777;
+  font-size: 14px;
+}
+
+.course-status {
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-draft { background: #e8e8ff; color: #4e4cd1; }
+.badge-published { background: #e8ffe8; color: #20a020; }
+.badge-ongoing { background: #fff4d6; color: #c47c00; }
+.badge-completed { background: #e6f7ff; color: #007acc; }
+.badge-cancelled { background: #ffe5e5; color: #cc0000; }
+
+.course-progress-wrapper {
+  margin-top: 6px;
+}
+
+.course-progress-bar {
+  width: 200px;
+  height: 6px;
+  background: #f1f1f1;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.course-progress-bar-fill {
+  height: 100%;
+  background: #6a5acd;
+  border-radius: 4px;
+}
+
+.course-progress-text {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+  display: block;
+}
+
+.course-card-right {
+  display: flex;
+  align-items: center;
+}
+
+.course-branch {
+  padding: 6px 12px;
+  background: #f3f3f3;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #555;
+}

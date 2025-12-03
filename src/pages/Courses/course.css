@@ -1,0 +1,174 @@
+.course-page {
+  width: 100%;
+  max-width: 1250px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+
+.tag {
+  background: #f0f3ff;
+  color: #5a61ff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.course-tabs {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.course-tab-item {
+  padding: 10px 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.course-tab-item.active {
+  border-bottom: 3px solid #5a61ff;
+  color: #5a61ff;
+}
+
+/* SECTIONS */
+
+.course-section {
+  margin-bottom: 50px;
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid #ececec;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.edit-btn {
+  background: #5a61ff;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 30px;
+}
+
+/* SYLLABUS */
+
+.syllabus-week {
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.syllabus-week-header {
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.syllabus-items {
+  padding: 12px 18px;
+}
+
+.syllabus-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+/* SCHEDULE */
+
+.schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 16px;
+}
+
+.schedule-day h4 {
+  margin-bottom: 12px;
+}
+
+.schedule-block {
+  background: #f3f6ff;
+  padding: 8px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center; /* <- BUTONLAR YUKARI KAYAMAZ */
+}
+
+.cancel-btn,
+.save-btn {
+  height: 44px;                /* sabit yükseklik */
+  padding: 0 20px;             /* yatay padding */
+  border-radius: 12px;
+  border: none;
+  display: flex;               /* DİKEY MERKEZLEME GARANTİ */
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  line-height: 1;              /* text baseline farkını yok eder */
+}
+
+.cancel-btn {
+  background: #ececec;
+  color: #222;
+}
+
+.save-btn {
+  background: #4A6CF7;
+  color: white;
+}
+
+
+/* Form layout */
+.info-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  border: 1px solid #dcdcdc;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}

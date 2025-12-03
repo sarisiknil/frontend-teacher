@@ -1,0 +1,19 @@
+.subnavbar {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+  border-bottom: 1px solid #eee;
+  padding: 0.5rem 1rem;
+}
+
+.subnavbar-item {
+  cursor: pointer;
+  padding: 0.4rem 0;
+  color: #666;
+}
+
+.subnavbar-item.active {
+  color: #5b6dfe;
+  font-weight: 700;
+  border-bottom: 2px solid #5b6dfe;
+}

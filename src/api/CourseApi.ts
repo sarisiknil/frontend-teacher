@@ -572,7 +572,7 @@ export const updateScheduleBlock = (
 export const removeScheduleBlock = (
   payload: CourseScheduleRemovalRequest
 ): Promise<ScheduleResponse> =>
-  apiPost<ScheduleResponse>(
+  apiDelete<ScheduleResponse>(
     "/api/course/course/schedule/remove",
     payload,
     { requireAuth: true }

@@ -149,7 +149,7 @@ export function CourseProvider({ courseId, children }: Props) {
     try {
       const res = await getCourseSchedule(courseId);
       // weekly busy map sits inside res.items[0].busy
-      setSchedule(res.items[0]?.busy ? res.items[0] : res.items[0] ?? null);
+      setSchedule(res.items[0] ?? null);
     } catch (err) {
       console.error(err);
     }
@@ -217,25 +217,49 @@ export function CourseProvider({ courseId, children }: Props) {
   // -----------------------------------------------------
   // SCHEDULE ACTIONS
   // -----------------------------------------------------
+// -----------------------------------------------------
+// SCHEDULE ACTIONS  (FULL IMPLEMENTATION)
+// -----------------------------------------------------
   const insertSchedule = async (payload: CourseScheduleInsertionRequest) => {
-    await insertScheduleBlock(payload);
-    await refreshSchedule();
+    try {
+      await insertScheduleBlock(payload);
+      await refreshSchedule();
+    } catch (err: any) {
+      console.error("insertSchedule error", err);
+      setError(err.message ?? "Program eklenemedi");
+    }
   };
 
   const updateSchedule = async (payload: CourseScheduleUpdateRequest) => {
-    await updateScheduleBlock(payload);
-    await refreshSchedule();
+    try {
+      await updateScheduleBlock(payload);
+      await refreshSchedule();
+    } catch (err: any) {
+      console.error("updateSchedule error", err);
+      setError(err.message ?? "Program güncellenemedi");
+    }
   };
 
   const removeSchedule = async (payload: CourseScheduleRemovalRequest) => {
-    await removeScheduleBlock(payload);
-    await refreshSchedule();
+    try {
+      await removeScheduleBlock(payload);
+      await refreshSchedule();
+    } catch (err: any) {
+      console.error("removeSchedule error", err);
+      setError(err.message ?? "Program öğesi silinemedi");
+    }
   };
 
   const clearSchedule = async (payload: CourseScheduleClearRequest) => {
-    await clearCourseSchedule(payload);
-    await refreshSchedule();
+    try {
+      await clearCourseSchedule(payload);
+      await refreshSchedule();
+    } catch (err: any) {
+      console.error("clearSchedule error", err);
+      setError(err.message ?? "Program temizlenemedi");
+    }
   };
+
 
   // -----------------------------------------------------
   // REQUEST DRAFT
@@ -286,7 +310,7 @@ export function CourseProvider({ courseId, children }: Props) {
     isCancelled: status === "CANCELLED",
 
     isEditable: status === "DRAFT",
-    isSchedulable: status === "PUBLISHED" || status === "ONGOING",
+    isSchedulable: status === "PUBLISHED" || status === "ONGOING" || status === "DRAFT",
   };
 
   return (

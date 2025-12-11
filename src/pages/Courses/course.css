@@ -111,6 +111,7 @@
   padding: 8px;
   border-radius: 8px;
   margin-bottom: 6px;
+  justify-content: space-between;
 }
 
 .edit-actions {
@@ -485,12 +486,7 @@
   align-items: center;
   gap: 6px;
 }
-.syllabus-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1.2fr;
-  gap: 24px;
-  padding: 20px;
-}
+
 .syllabus-col {
   background: #fff;
   border: 1px solid #ececec;
@@ -608,4 +604,111 @@
 .unit-group-title {
   font-size: 20px;  
   padding: 8px 14px;
+}
+.schedule-add-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+
+
+
+.schedule-add-panel {
+  background: #f9f9ff;
+  padding: 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ececec;
+}
+
+.schedule-add-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.schedule-add-row select,
+.schedule-add-row input[type="time"] {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+
+.schedule-editor-panel {
+  background: #f8f9ff;
+  padding: 16px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  border: 1px solid #e3e3ff;
+}
+
+.schedule-editor-row {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.schedule-editor-row label {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+
+
+
+/* Icons appear only when editing mode is active */
+.schedule-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+/* Base icon button */
+.icon-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid #dcdcec;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.15s ease;
+  padding: 0;
+}
+
+/* Hover effects */
+.icon-btn:hover {
+  background: #eef1ff;
+  border-color: #b8b8ff;
+}
+
+/* Edit icon color */
+.icon-btn.edit {
+  color: #4a6cf7;
+}
+
+/* Delete icon color */
+.icon-btn.delete {
+  color: #d64545;
+}
+
+/* Schedule block layout */
+.schedule-block {
+  background: #eef2ff;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Highlight when editing */
+.schedule-block.active-edit {
+  border: 2px solid #4a6cf7;
 }

@@ -75,12 +75,14 @@
 }
 
 .syllabus-week-header {
-  padding: 12px;
+  padding: 14px 18px;
+  background: #f9faff;
+  font-weight: 600;
   display: flex;
   justify-content: space-between;
-  cursor: pointer;
-  font-weight: 500;
+  border-bottom: 1px solid #eee;
 }
+
 
 .syllabus-items {
   padding: 12px 18px;
@@ -171,4 +173,439 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+}
+.syllabus-loading-banner {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #fff7e6;
+  color: #b26b00;
+  font-size: 13px;
+}
+
+.syllabus-week {
+  margin-bottom: 12px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #ececec;
+  background: #fafafa;
+}
+
+.syllabus-week-header {
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.syllabus-items {
+  padding: 8px 10px 12px;
+}
+
+.syllabus-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #fff;
+  margin-bottom: 6px;
+}
+
+.syllabus-item-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.icon-btn {
+  border: 1px solid #ddd;
+  background: #f5f5f5;
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.icon-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.remove-btn {
+  border: none;
+  background: #ffe6e6;
+  color: #c53030;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/* MODAL */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+}
+
+.modal {
+  width: 900px;
+  max-width: 95vw;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 18px 14px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.modal-close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.modal-body {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.modal-column h4 {
+  margin-bottom: 6px;
+}
+
+.modal-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+.modal-list-item {
+  padding: 6px 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.modal-list-item:hover {
+  background: #f0f3ff;
+}
+
+.modal-list-item.selected {
+  background: #e1e5ff;
+  font-weight: 600;
+}
+
+.week-input {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.primary-btn {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.secondary-btn {
+  background: #f3f4f6;
+  color: #111827;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.syllabus-week {
+  margin-bottom: 14px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.syllabus-week-header {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  cursor: pointer;
+  background: #f8f9fe;
+}
+
+.syllabus-items-section {
+  display: flex;
+  padding: 16px;
+  gap: 20px;
+}
+
+.unit-picker,
+.subunit-picker,
+.current-items {
+  flex: 1;
+}
+
+.unit-list,
+.subunit-list {
+  flex: 1;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 8px;
+  overflow-y: auto;
+  max-height: 320px;
+}
+.unit-item,
+.subunit-item {
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+.unit-item:hover,
+.subunit-item:hover {
+  background: #eef1ff;
+}
+.unit-item.active,
+.subunit-item.selected {
+  background: #dfe3ff;
+  font-weight: 600;
+}
+
+
+.syllabus-item {
+  padding: 8px 10px;
+  background: white;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.syllabus-actions button {
+  margin-left: 4px;
+}
+
+.modal.small {
+  width: 360px;
+}
+
+.primary-btn,
+.secondary-btn,
+.remove-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.move-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #d8d8ff;
+  background: #f3f4ff;
+  color: #4f46e5;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: 0.15s ease;
+}
+
+.move-btn:hover {
+  background: #e7e8ff;
+  border-color: #b8b8ff;
+}
+
+.move-btn:active {
+  background: #d9d9ff;
+}
+.remove-btn {
+  background: #ffe6e6;
+  color: #d64545;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.remove-btn:hover {
+  background: #ffd2d2;
+}
+
+.remove-btn:active {
+  background: #ffbaba;
+}
+.week-move-select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #dcdcdc;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+  transition: border 0.15s ease;
+}
+
+.week-mmove-select:hover,
+.week-mmove-select:focus {
+  border-color: #4f46e5;
+}
+.syllabus-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.syllabus-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr;
+  gap: 24px;
+  padding: 20px;
+}
+.syllabus-col {
+  background: #fff;
+  border: 1px solid #ececec;
+  padding: 16px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.add-week-btn {
+  margin-top: 12px;
+  width: 100%;
+  justify-self: flex-end;
+}
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.syllabus-actions-top {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.toggle-btn {
+  background: #e8e9ff;
+  color: #4b52dd;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.delete-btn {
+  background: #e8e9ff;
+  color: #4b52dd;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.week-delete-btn {
+  background: #e8e9ff;
+  color: #4b52dd;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.expand-icon {
+  padding: 8px 14px;
+}
+.collapse-icon {
+  font-size: 20px;   /* bigger arrow */
+  font-weight: bold;
+  margin-left: 6px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+
+.view-subunits-tree {
+  margin-left: 12px;
+  border-left: 2px solid #eee;
+  padding-left: 12px;
+}
+
+.subunit-tree-header {
+  cursor: pointer;
+  padding: 4px 0;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+}
+
+.outcomes-list {
+  margin-top: 4px;
+  margin-left: 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.outcome-item {
+  padding: 2px 0;
+}
+
+.outcome-empty {
+  opacity: 0.6;
+  font-style: italic;
+}
+/* Default — keep as is */
+.syllabus-grid {
+  display: grid;
+  grid-gap: 24px;
+}
+
+/* EDIT MODE → 3 columns */
+.syllabus-grid.edit-mode {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* VIEW MODE → 1 full-width column */
+.syllabus-grid.view-mode {
+  grid-template-columns: 1fr !important;
+}
+
+/* Ensure inside tree fills the entire width */
+.view-subunits-tree,
+.unit-group,
+.subunit-tree-block {
+  width: 100%;
+}
+.unit-group-title {
+  font-size: 20px;  
+  padding: 8px 14px;
 }

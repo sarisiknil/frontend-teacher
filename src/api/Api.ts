@@ -310,3 +310,14 @@ export function apiPatchForm<T>(
     opts
   );
 }
+export function apiDelete<T>(
+  path: string,
+  body: object,
+  opts: { requireAuth?: boolean } = {}
+): Promise<T> {
+  return apiFetch<T>(`${API_BASE}${path}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  }, opts);
+}

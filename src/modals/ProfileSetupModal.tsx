@@ -80,6 +80,22 @@ export default function ProfileSetupModal() {
             value={form.first_teaching_year}
             onChange={(e) => update("first_teaching_year", e.target.value)}
           />
+          <select
+              value={form.primary_branch}
+              onChange={(e) => update("primary_branch", e.target.value)}
+              className="profile-select"
+          >
+              <option value="">Select Primary Branch</option>
+              {[
+                  "TURKCE", "MATEMATIK", "FIZIK", "KIMYA", "BIYOLOJI", "TARIH",
+                  "COGRAFYA", "FELSEFE", "DIN_KULTURU_VE_AHLAK_BILGISI",
+                  "TURK_DILI_VE_EDEBIYATI", "GEOMETRI", "PSIKOLOJI",
+                  "SOSYOLOJI", "MANTIK",
+                  "INGILIZCE", "ALMANCA", "FRANSIZCA", "ARAPCA", "RUSCA"
+              ].map(b => (
+                  <option key={b} value={b}>{b.replace(/_/g, " ")}</option>
+              ))}
+          </select>
 
           <textarea
             className="profile-setup-textarea"

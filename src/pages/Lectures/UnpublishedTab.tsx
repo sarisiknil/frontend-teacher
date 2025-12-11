@@ -9,6 +9,7 @@ import LectureNavbar from "../../components/lectures/LectureNavbar";
 import SubNavbar from "../../components/lectures/SubNavbar";
 import CourseCard from "../../components/lectures/CourseCard";
 import { Link } from "react-router-dom";
+import { cancelCourse } from "../../api/CourseApi";
 
 
 import "./UnpublishedLecturesPage.css";
@@ -45,6 +46,27 @@ export default function UnpublishedLecturesPage() {
   const filteredCourses = FILTERS[subTab]
     ? courses.filter(FILTERS[subTab])
     : [];
+  async function handleCancel(course: CourseRead) {
+    if (!teacherId) return;
+
+    // Only allow cancelling drafts
+    if (course.course_status !== "DRAFT") {
+      alert("Only draft courses can be cancelled.");
+      return;
+    }
+
+    try {
+      const res1 = await cancelCourse(course.course_id);
+      console.log(res1);
+      const res = await getCoursesByTeacher(teacherId);
+      setCourses(res.items);
+
+    } catch (err) {
+      console.error("Cancel error:", err);
+    }
+  }
+
+
 
   return (
     <div className="unpublished-page">
@@ -61,7 +83,13 @@ export default function UnpublishedLecturesPage() {
         ) : (
           filteredCourses.map((course) => (
             <Link key={course.course_id} to={`/course/${course.course_id}`}>
-                <CourseCard course={course} />
+                  <CourseCard
+                    key={course.course_id}
+                    course={course}
+                    onCancel={() => handleCancel(course)}
+                    onStart={() => {} }
+                    onComplete={() => {}}
+                  />
             </Link>
           ))
         )}

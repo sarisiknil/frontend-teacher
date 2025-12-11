@@ -76,7 +76,9 @@
 
 .course-card-right {
   display: flex;
-  align-items: center;
+  flex-direction: column;   /* stack vertically */
+  gap: 16px;                 /* spacing between them (optional) */
+  align-items: flex-end;    /* right-align, optional */
 }
 
 .course-branch {
@@ -85,4 +87,25 @@
   border-radius: 8px;
   font-size: 13px;
   color: #555;
+}
+.cancel-button {
+  padding: 6px 12px;
+  background: #e85f5f;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #fffdfd;
+}
+.start-button {
+  padding: 6px 12px;
+  background: #e85f5f;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #81ec71;
+}
+.complete-button {
+  padding: 6px 12px;
+  background: #e85fbf;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #81ec71;
 }

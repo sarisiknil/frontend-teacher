@@ -63,3 +63,31 @@
   font-size: 13px;
   font-weight: 500;
 }
+.approval-box {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.approval-comment {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.approval-button {
+  padding: 10px 16px;
+  background: #fdffa4;
+  color: rgba(0, 0, 0, 0.901);
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+}
+
+.approval-button:hover {
+  background: #4b52e0;
+}

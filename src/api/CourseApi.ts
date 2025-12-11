@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPatch } from "./Api";
+import { apiGet, apiPost, apiPatch, apiDelete } from "./Api";
 
 // ============================================================
 // CURRICULUM TYPES
@@ -470,11 +470,12 @@ export const insertSyllabusItem = (
 export const removeSyllabusItem = (
   payload: SyllabusRemoveRequest
 ): Promise<ApiListResponse<CourseSyllabusRead>> =>
-  apiPost<ApiListResponse<CourseSyllabusRead>>(
+  apiDelete<ApiListResponse<CourseSyllabusRead>>(
     "/api/course/course/syllabus/remove",
     payload,
     { requireAuth: true }
   );
+
 export const orderSyllabusWeek = (
   payload: SyllabusOrderWeekRequest
 ): Promise<ApiListResponse<CourseSyllabusRead>> =>

@@ -1,7 +1,8 @@
-import type { CourseRead } from "../../api/CourseApi";
+import type 
+{ CourseRead } from "../../api/CourseApi";
 import "./CourseCard.css";
 
-export default function CourseCard({ course }: { course: CourseRead }) {
+export default function CourseCard({course,onCancel, onStart, onComplete}: {course: CourseRead; onCancel: (course: CourseRead) => void; onStart: (course: CourseRead) => void; onComplete: (course: CourseRead) => void;}) {
   const statusColor: Record<string, string> = {
     DRAFT: "badge-draft",
     PUBLISHED: "badge-published",
@@ -50,6 +51,44 @@ export default function CourseCard({ course }: { course: CourseRead }) {
         <span className="course-branch">
           {course.course_subbranch?.name || "No Subbranch"}
         </span>
+        
+        {course.course_status === "DRAFT" && (
+          <button
+            className="cancel-button"
+            onClick={(e) => {
+              e.preventDefault(); 
+              e.stopPropagation();
+              onCancel(course);
+            }}
+          >
+            Cancel Course
+          </button>
+        )}
+        {course.course_status === "PUBLISHED" && (
+          <button
+            className="start-button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onStart(course);
+            }}
+          >
+            Publish Course
+          </button>
+        )}
+        {course.course_status === "ONGOING" && (
+          <button
+            className="complete-button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onComplete(course);
+            }}
+          >
+            Complete Course
+          </button>
+        )}
+
       </div>
     </div>
   );

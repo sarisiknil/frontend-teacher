@@ -1,6 +1,6 @@
 // src/contexts/UserContext.tsx
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { getUserInfo, logoutRequest, refreshRequest, userLookup } from "../api/Api";
+import { createContext, useContext, useEffect, useMemo, useState, useRef, useCallback } from "react";
+import { getUserInfo, logoutRequest, refreshRequest, userLookup } from "../api/Api"; 
 import { configureApiAuth } from "../api/Api";
 
 export type Session = {
@@ -30,11 +30,13 @@ export interface UserInfo {
 
 const STORAGE_KEY = "app_session_v1";
 const UserContext = createContext<UserContextType | undefined>(undefined);
+let refreshPromise: Promise<boolean> | null = null;
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const tokenRef = useRef<string | null>(null);
 
   // ---------------- LOGIN ----------------
   const login = (s: { access_token: string; refresh_token: string; expiration: number; identifier: string }) => {
@@ -44,13 +46,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       expiration: Date.now() + s.expiration * 60 * 1000,
       identifier: s.identifier,
     };
+    tokenRef.current = normalized.access_token;
 
     setSession(normalized);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
   };
 
-  // ---------------- LOGOUT ----------------
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       if (session) {
         await logoutRequest(session.access_token, session.refresh_token);
@@ -58,35 +60,54 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.warn("Logout request failed:", err);
     }
+    
+    tokenRef.current = null;
     setSession(null);
     localStorage.removeItem(STORAGE_KEY);
-  };
+  }, [session]);
 
-  // ---------------- REFRESH TOKEN ----------------
-  const refreshSession = async (): Promise<boolean> => {
-    if (!session) return false;
+  const refreshSession = useCallback(async (): Promise<boolean> => {
+    if (!tokenRef.current && !session) return false;
 
-    try {
-      const res = await refreshRequest(session.access_token, session.refresh_token);
+    if (refreshPromise) return refreshPromise;
 
-      const updated: Session = {
-        access_token: res.access_token,
-        refresh_token: res.refresh_token ?? session.refresh_token,
-        expiration: Date.now() + res.expiration * 60 * 1000,
-        identifier: session.identifier,
-      };
+    const refreshExecution = async (): Promise<boolean> => {
+      const currentRefreshToken = session?.refresh_token; 
+      const currentAccessToken = session?.access_token;
 
-      setSession(updated);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      if (!currentRefreshToken || !currentAccessToken) return false;
 
-      return true;
-    } catch {
-      await logout();
-      return false;
-    }
-  };
+      try {
+        const res = await refreshRequest(currentAccessToken, currentRefreshToken);
 
-  const getAccessToken = () => session?.access_token ?? null;
+        const updated: Session = {
+          access_token: res.access_token,
+          refresh_token: res.refresh_token ?? currentRefreshToken,
+          expiration: Date.now() + res.expiration * 60 * 1000,
+          identifier: session?.identifier || "", 
+        };
+
+        tokenRef.current = updated.access_token;
+
+        setSession(updated);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+
+        return true;
+      } catch (err) {
+        await logout();
+        return false;
+      } finally {
+        refreshPromise = null;
+      }
+    };
+
+    refreshPromise = refreshExecution();
+    return refreshPromise;
+  }, [session, logout]); 
+
+  const getAccessToken = useCallback(() => {
+    return tokenRef.current;
+  }, []);
 
   // ---------------- RESTORE FROM LOCAL STORAGE ----------------
   useEffect(() => {
@@ -95,8 +116,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
       if (raw) {
         const parsed: Session = JSON.parse(raw);
-
-        if (parsed.expiration > Date.now()) {
+        // Ensure we accept expired tokens so refresh can happen
+        if (parsed?.refresh_token) {
+          tokenRef.current = parsed.access_token;
           setSession(parsed);
         } else {
           localStorage.removeItem(STORAGE_KEY);
@@ -129,17 +151,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     loadUserInfo();
   }, [session]);
 
-
-
+  // ---------------- CONFIG API AUTH ----------------
   useEffect(() => {
     configureApiAuth({
       getAccessToken,
       onUnauthorized: logout,
       refreshSession,
     });
-  }, [session]); // re-run when token changes
+  }, [getAccessToken, refreshSession, logout]); 
 
-  // ---------------- CONTEXT VALUE ----------------
   const value = useMemo(
     () => ({
       session,
@@ -151,7 +171,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       getAccessToken,
       refreshSession,
     }),
-    [session, userInfo, isLoading]
+    [session, userInfo, isLoading, getAccessToken, refreshSession, logout]
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

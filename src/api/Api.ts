@@ -38,9 +38,6 @@ function parseError(status: number, body: any): ApiError {
   };
 }
 
-// --------------------
-//  CORE FETCH WRAPPER
-// --------------------
 export async function apiFetch<T>(
   url: string,
   init: RequestInit = {},
@@ -71,7 +68,7 @@ export async function apiFetch<T>(
       status: 0,
       message: "Network error: cannot reach server",
       detail: networkError,
-    } as ApiError;
+    };
   }
 
   // 401 -> try refresh
@@ -79,25 +76,23 @@ export async function apiFetch<T>(
     if (refreshSession) {
       const refreshed = await refreshSession();
       if (refreshed) {
+        // 💡 CRITICAL FIX: Wait for the Event Loop to update the Token Ref
+        await new Promise(resolve => setTimeout(resolve, 0));
+        
         retry++;
         response = await doRequest();
       } else {
         onUnauthorized?.();
-        throw { status: 401, message: "Unauthorized" } as ApiError;
+        throw { status: 401, message: "Unauthorized" };
       }
     }
   }
 
-  // Not OK -> throw structured error
   if (!response.ok) {
     let body: any = null;
-
     try {
       body = await response.json();
-    } catch {
-      /* ignore */
-    }
-
+    } catch { /* ignore */ }
     throw parseError(response.status, body);
   }
 

@@ -1,34 +1,44 @@
 import "./LectureNavbar.css";
 import { useNavigate } from "react-router-dom";
-import CreateCourseModal from "./CreateCourseModal";
+import CreateCourseModal from "./CreateCourseModal"; 
 import { useState } from "react";
+
+interface LectureNavbarProps {
+  active: string;
+  setActive: (v: string) => void;
+  onRefresh: () => void; 
+}
 
 export default function LectureNavbar({
   active,
   setActive,
-}: {
-  active: string;
-  setActive: (v: string) => void;
-}) {
-  const tabs = ["unpublished", "published", "constraints"];
+  onRefresh, 
+}: LectureNavbarProps) {
+  
+  const navItems = [
+    { key: "unpublished", label: "Pasif" },
+    { key: "published", label: "Yayında" },
+    { key: "constraints", label: "Kısıtlamalar" },
+  ];
+
   const navigate = useNavigate();
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const handleClick = (tab: string) => {
-    setActive(tab);
-    navigate(`/my-lectures/${tab}`);
+  const handleClick = (key: string) => {
+    setActive(key);
+    navigate(`/my-lectures/${key}`);
   };
 
   return (
     <div className="lecture-navbar">
       <div className="lecture-navbar-left">
-        {tabs.map((tab) => (
+        {navItems.map((item) => (
           <div
-            key={tab}
-            className={`lecture-navbar-item ${active === tab ? "active" : ""}`}
-            onClick={() => handleClick(tab)}
+            key={item.key}
+            className={`lecture-navbar-item ${active === item.key ? "active" : ""}`}
+            onClick={() => handleClick(item.key)}
           >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {item.label}
           </div>
         ))}
       </div>
@@ -37,10 +47,14 @@ export default function LectureNavbar({
         className="create-course-btn-small"
         onClick={() => setShowCreateModal(true)}
       >
-        + Create
+        + Oluştur
       </button>
+
       {showCreateModal && (
-        <CreateCourseModal onClose={() => setShowCreateModal(false)} />
+        <CreateCourseModal 
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={onRefresh}
+        />
       )}
     </div>
   );

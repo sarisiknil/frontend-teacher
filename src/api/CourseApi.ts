@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPatch, apiDelete } from "./Api";
+import { apiGet, apiPost, apiPatch, apiDelete, apiPatchForm } from "./Api";
 
 // ============================================================
 // CURRICULUM TYPES
@@ -28,7 +28,7 @@ export type Level = {
 export type Subbranch = {
   id: string;
   level_id: string;
-  branch: string; // or Branch if you want stricter typing
+  branch: Branch;
   name: string;
   code: string;
   description: string;
@@ -38,7 +38,7 @@ export type Subbranch = {
 export type Units = {
   id: string;
   subbranch_id: string;
-  branch: string;
+  branch: Branch;
   name: string;
   code: string;
   description: string;
@@ -49,7 +49,7 @@ export type Units = {
 export type SubUnits = {
   id: string;
   unit_id: string;
-  branch: string;
+  branch: Branch;
   name: string;
   code: string;
   description: string;
@@ -64,7 +64,7 @@ export type SubUnits = {
 export type Outcomes = {
   id: string;
   subunit_id: string;
-  branch: string;
+  branch: Branch;
   code: string;
   description: string;
   order_index: number;
@@ -209,6 +209,10 @@ export interface CourseRead {
 
   completed_lessons: number;
   total_lessons: number;
+  course_difficulty: CourseDifficulty | null;
+  course_type: CourseType | null;
+
+  banner_url: string | null;
 
   description: string | null;
   start_date: string;
@@ -235,7 +239,6 @@ export const getCoursesBatch = (
     include_teacher_overview: include_teacher_overview ? 1 : 0,
   };
 
-  // Convert array → repeated params: ?course_ids=a&course_ids=b
   course_ids.forEach((id, index) => {
     query[`course_ids[${index}]`] = id;
   });
@@ -277,6 +280,7 @@ export interface CourseUpdateRequest {
   total_lessons?: number | null;
   difficulty?: CourseDifficulty | null;
   course_type?: CourseType | null;
+  banner_url?: string | null;
   description?: string | null;
   subbranch_id?: string | null;
   start_date?: string | null;
@@ -408,7 +412,6 @@ export interface SubunitTree {
   priority: SubunitPriority | null;
   background_level: SubunitBackgroundLevel | null;
   detail: SubunitDetail | null;
-
   outcomes: OutcomeRead[];
 }
 export interface CourseSyllabusRow {
@@ -585,3 +588,21 @@ export const clearCourseSchedule = (
     payload,
     { requireAuth: true }
   );
+
+export const uploadCourseBanner = async (
+  course_id: string,
+  file: File
+): Promise<CourseRead> => {
+  const form = new FormData();
+  form.append("file", file);
+  const res = await apiPatchForm<ApiListResponse<CourseRead>>(
+    `/api/course/course/banner?course_id=${course_id}`, 
+    form,
+    { 
+      requireAuth: true 
+    }
+  );
+
+  // Return the single item directly
+  return res.items[0];
+};

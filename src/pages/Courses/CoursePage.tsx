@@ -1,4 +1,3 @@
-// pages/Course/CoursePage.tsx
 import { useState } from "react";
 import { useCourse } from "../../contexts/CourseContext";
 
@@ -15,11 +14,33 @@ export default function CoursePage() {
   const [activeTab, setActiveTab] = useState<"dersim" | "materyaller" | "analiz">("dersim");
 
   if (loading || !course) {
-    return <div className="course-loading">Loading course...</div>;
+    return <div className="course-loading">Ders yükleniyor...</div>;
   }
+
+  const isDraft = course.course_status === "DRAFT";
+
+  const reviewStatus = (course as any).latest_review_status;
+  const isPending = reviewStatus === "PENDING";
 
   return (
     <div className="course-page">
+      
+      {/* STATUS BANNERS */}
+      
+      {/* Show Pending Banner if waiting for approval */}
+      {isPending && (
+        <div className="status-banner info">
+          ℹ️ <strong>İncelemede:</strong> Kursunuz şu anda yönetici onayı beklemektedir.
+        </div>
+      )}
+
+      {/* Show Draft Banner ONLY if it is NOT pending review */}
+      {isDraft && !isPending && (
+        <div className="status-banner warning">
+          ⚠️ <strong>Taslak Modu:</strong> Bu kurs henüz yayınlanmadı. İçerikleri düzenleyip onaya gönderebilirsiniz.
+        </div>
+      )}
+
       {/* TOP HERO */}
       <CourseHero />
 

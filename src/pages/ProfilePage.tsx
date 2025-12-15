@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useProfile } from "../contexts/ProfileContext";
 import "./ProfilePage.css";
 import { getLevels, readChildSubbranches } from "../api/CourseApi";
 import type { Level, Subbranch } from "../api/CourseApi";
-
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
@@ -21,6 +20,24 @@ export default function ProfilePage() {
         requestTeacherApproval
     } = useProfile();
 
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // -----------------------------
+    // HATA MESAJI FORMATLAYICI
+    // -----------------------------
+    const formatError = (error: any): string => {
+        if (!error) return "Bilinmeyen bir hata oluştu.";
+        const detail = error.response?.data?.detail;
+        if (detail) {
+            if (typeof detail === "string") return detail;
+            if (Array.isArray(detail)) {
+                return detail.map((err: any) => err.msg || JSON.stringify(err)).join(", ");
+            }
+            return JSON.stringify(detail);
+        }
+        return error.message || "Sunucu ile iletişim hatası.";
+    };
+
     // -----------------------------
     // FORM STATE
     // -----------------------------
@@ -33,21 +50,15 @@ export default function ProfilePage() {
         primary_branch: "",
     });
 
-    const [avatar, setAvatar] = useState<File | null>(null);
     const [approvalComment, setApprovalComment] = useState("");
     const [approvalMessage, setApprovalMessage] = useState("");
 
-    // -----------------------------
-    // CURRICULUM STATE (levels + subbranches)
-    // -----------------------------
     const [levels, setLevels] = useState<Level[]>([]);
     const [levelSubbranches, setLevelSubbranches] = useState<Record<string, Subbranch[]>>({});
-    const [subbranches, setSubbranches] = useState<string[]>([]); // stores subbranch IDs
-
-
+    const [subbranches, setSubbranches] = useState<string[]>([]);
 
     // -----------------------------
-    // INITIAL PROFILE LOAD
+    // INITIAL LOAD
     // -----------------------------
     useEffect(() => {
         refreshProfile();
@@ -56,7 +67,6 @@ export default function ProfilePage() {
     useEffect(() => {
         if (!profile || !overview) return;
 
-        // Fill form
         setForm({
             name: profile.name ?? "",
             surname: profile.surname ?? "",
@@ -66,7 +76,6 @@ export default function ProfilePage() {
             primary_branch: overview.Primary_Branch ?? "",
         });
 
-        // Existing subbranches → store ID strings
         if (overview.Subbranches) {
             setSubbranches(overview.Subbranches.map(sb => sb.branch_id));
         }
@@ -86,101 +95,165 @@ export default function ProfilePage() {
                 lvl.forEach(level => {
                     map[level.id] = sbRes.items.filter(sb => sb.level_id === level.id);
                 });
-
                 setLevelSubbranches(map);
-            } catch (e) {
-                console.error("Failed to load curriculum:", e);
+            } catch (e: any) {
+                console.error("Müfredat yüklenemedi:", e);
+                alert("Ders listesi yüklenirken hata: " + formatError(e));
             }
         }
-
         loadCurriculum();
     }, []);
 
     // -----------------------------
-    // TOGGLE SUBBRANCH
+    // HANDLERS
     // -----------------------------
     function toggleSubbranch(id: string) {
         setSubbranches(prev =>
-            prev.includes(id)
-                ? prev.filter(x => x !== id)
-                : [...prev, id]
+            prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
         );
     }
 
-    // -----------------------------
-    // TEACHER STATUS BADGE
-    // -----------------------------
     function renderStatusBadge() {
-        if (!teacherApprovals || teacherApprovals.length === 0) {
-            return <span className="status-badge neutral">Not Verified</span>;
-        }
-
+        if (!teacherApprovals || teacherApprovals.length === 0) return <span className="status-badge neutral">Doğrulanmamış</span>;
         const latest = teacherApprovals[0];
+        
+        // Backend 'Statu' veya 'status' dönebilir, ikisini de kontrol edelim.
+        const statusValue = latest.Statu || (latest as any).status;
 
-        switch (latest.Statu) {
-            case "PENDING":
-                return <span className="status-badge pending">Pending</span>;
-            case "APPROVED":
-                return <span className="status-badge approved">Verified</span>;
-            case "REJECTED":
-                return <span className="status-badge rejected">Rejected</span>;
-            default:
-                return <span className="status-badge neutral">Unknown</span>;
+        switch (statusValue) {
+            case "PENDING": return <span className="status-badge pending">Beklemede</span>;
+            case "APPROVED": return <span className="status-badge approved">Doğrulandı</span>;
+            case "REJECTED": return <span className="status-badge rejected">Reddedildi</span>;
+            default: return <span className="status-badge neutral">Bilinmiyor</span>;
         }
     }
 
-    // -----------------------------
-    // TEACHER APPROVAL REQUEST
-    // -----------------------------
     async function handleTeacherApproval() {
         try {
-            await requestTeacherApproval(approvalComment);
-            setApprovalMessage("Your teacher approval request was sent successfully!");
-        } catch (err) {
-            console.error(err);
-            setApprovalMessage("Approval request failed.");
+            console.log("Manuel onay isteği gönderiliyor...");
+            await requestTeacherApproval(approvalComment || "Onay talebi.");
+            setApprovalMessage("Onay talebiniz başarıyla gönderildi!");
+            setApprovalComment("");
+            await refreshProfile();
+            alert("Onay talebiniz başarıyla iletildi."); 
+        } catch (err: any) {
+            console.error("Manuel onay isteği hatası:", err);
+            const msg = formatError(err);
+            setApprovalMessage("Onay talebi başarısız oldu.");
+            alert("Doğrulama isteği hatası: " + msg);
         }
     }
 
-    // -----------------------------
-    // UPDATE FORM FIELD
-    // -----------------------------
     const updateField = (field: string, value: string) =>
         setForm(prev => ({ ...prev, [field]: value }));
 
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                alert("Dosya boyutu çok yüksek. Lütfen 5MB'dan küçük bir resim seçin.");
+                return;
+            }
+            try {
+                await updatePicture(file);
+                await refreshProfile();
+            } catch (error: any) {
+                console.error("Resim yükleme hatası:", error);
+                alert("Profil fotoğrafı yüklenirken hata oluştu:\n" + formatError(error));
+            } finally {
+                if (fileInputRef.current) fileInputRef.current.value = "";
+            }
+        }
+    };
+
     // -----------------------------
-    // SAVE CHANGES
+    // KAYDETME HANDLER (DÜZELTİLMİŞ)
     // -----------------------------
     async function saveAll() {
-        await updateProfile({
-            name: form.name,
-            surname: form.surname,
-            birthdate: form.birth_date,
-        });
+        // 1. Temel Validasyon
+        if (!form.name || !form.surname) {
+            alert("İsim ve Soyisim alanları zorunludur.");
+            return;
+        }
 
-        await updateTeacher({
-            biography: form.biography,
-            primary_branch: form.primary_branch,
-            first_teaching_year: Number(form.first_teaching_year),
-        });
+        const teachingYear = parseInt(form.first_teaching_year);
+        const currentYear = new Date().getFullYear();
+
+        if (form.first_teaching_year && (isNaN(teachingYear) || teachingYear > currentYear || form.first_teaching_year.length !== 4)) {
+            alert("Lütfen geçerli, 4 haneli bir mesleğe başlama yılı giriniz (Örn: 2015).");
+            return;
+        }
+
+        // 2. Değişiklik Kontrolü
+        const profileChanged = 
+            form.name !== (profile?.name || "") || 
+            form.surname !== (profile?.surname || "") || 
+            form.birth_date !== (profile?.birth_date || "");
+
+        const teacherChanged = 
+            form.biography !== (overview?.Biography || "") ||
+            form.primary_branch !== (overview?.Primary_Branch || "") ||
+            String(form.first_teaching_year) !== String(overview?.First_Teaching_Year || "");
 
         const backendIds = overview?.Subbranches?.map(sb => sb.branch_id) ?? [];
-
         const added = subbranches.filter(id => !backendIds.includes(id));
         const removed = backendIds.filter(id => !subbranches.includes(id));
+        const subbranchesChanged = added.length > 0 || removed.length > 0;
 
-        await updateSubbranches({ added, removed });
+        if (!profileChanged && !teacherChanged && !subbranchesChanged) {
+            alert("Herhangi bir değişiklik yapmadınız.");
+            return;
+        }
 
-        if (avatar) await updatePicture(avatar);
+        // 3. Güncellemeleri Uygula (Try-Catch Blokları Ayrıldı)
+        let updateSuccess = true;
+        let approvalNote = "";
 
-        await refreshProfile();
+        try {
+            if (profileChanged) {
+                await updateProfile({
+                    name: form.name,
+                    surname: form.surname,
+                    birthdate: form.birth_date,
+                });
+            }
+
+            if (teacherChanged) {
+                await updateTeacher({
+                    biography: form.biography,
+                    primary_branch: form.primary_branch,
+                    first_teaching_year: teachingYear,
+                });
+            }
+
+            if (subbranchesChanged) {
+                await updateSubbranches({ added, removed });
+            }
+            
+        } catch (error: any) {
+            console.error("Profil güncelleme hatası:", error);
+            alert("Değişiklikler kaydedilirken hata oluştu: " + formatError(error));
+            updateSuccess = false;
+        }
+
+        // Eğer güncellemeler başarılıysa Onay Durumunu kontrol et
+        if (updateSuccess) {
+            // Statü kontrolü
+            const latestStatus = teacherApprovals?.[0]?.Statu;
+            console.log("Mevcut Onay Durumu:", latestStatus);
+
+
+            // Başarı Mesajı
+            setApprovalMessage("");
+            alert("Değişiklikler başarıyla kaydedildi." + approvalNote);
+            
+            // Sayfayı yenile (verileri tekrar çek)
+            await refreshProfile();
+        }
     }
 
-    // -----------------------------
-    // LOADING STATE
-    // -----------------------------
     if (isProfileLoading || !profile || !overview) {
-        return <div className="profile-loading">Loading...</div>;
+        return <div className="profile-loading">Yükleniyor...</div>;
     }
 
     // ============================================================
@@ -192,10 +265,9 @@ export default function ProfilePage() {
 
                 {/* LEFT - PROFILE PIC */}
                 <div className="profile-pic-column">
-
                     <div className="profile-info-over">
                         <h1>{profile.name} {profile.surname}</h1>
-                        <p>{overview.Primary_Branch || "No primary branch"}</p>
+                        <p>{overview.Primary_Branch ? overview.Primary_Branch.replace(/_/g, " ") : "Branş Seçilmedi"}</p>
                     </div>
 
                     <div className="profile-pic-wrapper">
@@ -210,41 +282,36 @@ export default function ProfilePage() {
                         />
                         <div
                             className="profile-pic-overlay"
-                            onClick={() => document.getElementById("avatar-input")?.click()}
+                            onClick={() => fileInputRef.current?.click()}
                         >
-                            Change
+                            Değiştir
                         </div>
                     </div>
 
                     <input
-                        id="avatar-input"
+                        ref={fileInputRef}
                         type="file"
                         accept="image/*"
                         className="profile-file-input"
-                        onChange={(e) => {
-                            if (e.target.files?.[0]) {
-                                setAvatar(e.target.files[0]);
-                                updatePicture(e.target.files[0]).then(refreshProfile);
-                            }
-                        }}
+                        onChange={handleFileChange}
                     />
                 </div>
 
                 {/* RIGHT - TEACHER APPROVAL */}
                 <div className="profile-info-right">
                     <div className="verification-box">
-                        <div className="verification-header">Teacher Verification Status</div>
+                        <div className="verification-header">Eğitmen Doğrulama Durumu</div>
                         <div className="verification-status">{renderStatusBadge()}</div>
-
+                        
                         <textarea
                             className="verification-comment"
-                            placeholder="Write a comment for your verification request…"
+                            placeholder="Profilinizi düzenlemeyi bitirdiğinizde öğrencilerin sizi bulabilmesi için profilinizi onaya gönderin."
                             value={approvalComment}
                             onChange={(e) => setApprovalComment(e.target.value)}
                         />
 
                         <button className="verification-btn" onClick={handleTeacherApproval}>
-                            Request Verification
+                            Onaya Gönder
                         </button>
 
                         {approvalMessage && (
@@ -252,33 +319,27 @@ export default function ProfilePage() {
                         )}
                     </div>
                 </div>
-
             </div>
 
             {/* INFO SECTIONS */}
             <div className="profile-sections">
-
-                {/* PERSONAL INFO */}
                 <section className="profile-section">
-                    <h2>Personal Information</h2>
-
+                    <h2>Kişisel Bilgiler</h2>
                     <div className="profile-form">
-                        <input value={form.name} onChange={(e) => updateField("name", e.target.value)} placeholder="Name" />
-                        <input value={form.surname} onChange={(e) => updateField("surname", e.target.value)} placeholder="Surname" />
+                        <input value={form.name} onChange={(e) => updateField("name", e.target.value)} placeholder="İsim" />
+                        <input value={form.surname} onChange={(e) => updateField("surname", e.target.value)} placeholder="Soyisim" />
                         <input value={form.birth_date} type="date" onChange={(e) => updateField("birth_date", e.target.value)} />
                     </div>
                 </section>
 
-                {/* TEACHER INFO */}
                 <section className="profile-section">
-                    <h2>Teacher Profile</h2>
-
+                    <h2>Eğitmen Profili</h2>
                     <div className="profile-form">
-
                         <input
+                            type="number"
                             value={form.first_teaching_year}
                             onChange={(e) => updateField("first_teaching_year", e.target.value)}
-                            placeholder="First Teaching Year"
+                            placeholder="Mesleğe Başlama Yılı (Örn: 2018)"
                         />
 
                         <select
@@ -286,7 +347,7 @@ export default function ProfilePage() {
                             onChange={(e) => updateField("primary_branch", e.target.value)}
                             className="profile-select"
                         >
-                            <option value="">Select Primary Branch</option>
+                            <option value="">Ana Branş Seçiniz</option>
                             {[
                                 "TURKCE", "MATEMATIK", "FIZIK", "KIMYA", "BIYOLOJI", "TARIH",
                                 "COGRAFYA", "FELSEFE", "DIN_KULTURU_VE_AHLAK_BILGISI",
@@ -298,14 +359,14 @@ export default function ProfilePage() {
                             ))}
                         </select>
 
-                        {/* SUBBRANCHES - GROUPED BY LEVEL */}
                         <div className="subbranch-section">
-                            <h3>Select Subbranches</h3>
-
+                            <h3>Verebileceğiniz Dersleri Seçin</h3>
+                            <p style={{ fontSize: "0.9rem", color: "#666", marginBottom: "10px" }}>
+                                Aşağıdaki listeden yetkin olduğunuz ve ders vermek istediğiniz konuları işaretleyiniz.
+                            </p>
                             {levels.map(level => (
                                 <details key={level.id} className="level-block">
                                     <summary className="level-name">{level.name}</summary>
-
                                     <div className="subbranch-list">
                                         {levelSubbranches[level.id]?.map(sb => (
                                             <label key={sb.id} className="subbranch-item">
@@ -325,17 +386,14 @@ export default function ProfilePage() {
                         <textarea
                             value={form.biography}
                             onChange={(e) => updateField("biography", e.target.value)}
-                            placeholder="Biography"
+                            placeholder="Biyografi / Hakkımda"
                         />
                     </div>
                 </section>
-
                 <button className="profile-save-btn" onClick={saveAll}>
-                    Save Changes
+                    Değişiklikleri Kaydet
                 </button>
-
             </div>
-
         </div>
     );
 }

@@ -64,7 +64,7 @@ function App() {
           <Route path="/my-lectures/unpublished" element={<UnpublishedLecturesPage />} />
           <Route path="/my-lectures/published" element={<PublishedLecturesPage />} />
 
-          {/* ✅ COURSE ROUTES */}
+          {/*  COURSE ROUTES */}
           <Route path="/course/:courseId" element={<CourseRouteWrapper />}>
             <Route index element={<CoursePage />} />
             <Route path="live-lecture" element={<LiveLecturePage />} />

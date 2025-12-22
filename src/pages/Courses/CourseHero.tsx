@@ -114,6 +114,8 @@ export default function CourseHero() {
       alert("Dosya çok büyük. Max 5MB.");
       return;
     }
+    console.log(draftLoading);
+    console.log(draftError);
 
     try {
       setIsUploading(true);

@@ -266,6 +266,7 @@ export default function CourseSyllabusSection() {
       setExpandedWeeks((prev) =>
         prev.length === 0 ? [firstWeek] : prev
       );
+      console.log(loadingUnits);
     }
   }, [syllabus]);
 

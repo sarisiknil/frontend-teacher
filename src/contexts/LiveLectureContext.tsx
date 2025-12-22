@@ -14,7 +14,7 @@ import {
   getVerifyLessonToken,
 } from "../api/LiveLectureApi";
 
-import type { LiveLectureStatus, ZoomJWT } from "../api/live_lecture_types";
+import type { LiveLectureStatus } from "../api/live_lecture_types";
 
 interface LiveLectureContextState {
   status: LiveLectureStatus | null;

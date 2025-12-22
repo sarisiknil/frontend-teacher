@@ -1,0 +1,81 @@
+.live-lecture-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+  margin-bottom: 18px;
+}
+
+.live-lecture-card__title {
+  font-weight: 700;
+  color: #111827;
+  font-size: 1.05rem;
+}
+
+.live-lecture-card__subtitle {
+  margin-top: 6px;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.live-lecture-card__meta {
+  margin-top: 10px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #111827;
+  font-size: 0.85rem;
+  border: 1px solid #e5e7eb;
+}
+
+.live-lecture-card__error {
+  margin-top: 10px;
+  color: #b91c1c;
+  font-size: 0.9rem;
+}
+
+.live-lecture-card__right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.primary-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: #111827;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secondary-btn {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: #ffffff;
+  color: #111827;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.secondary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

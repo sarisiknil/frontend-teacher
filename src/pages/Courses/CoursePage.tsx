@@ -8,6 +8,7 @@ import CourseSyllabusSection from "./CourseSyllabusSection";
 import CourseScheduleSection from "./CourseScheduleSection";
 
 import "./course.css";
+import CourseLiveLectureCard from "../../components/lectures/CourseLiveLectureCard";
 
 export default function CoursePage() {
   const { loading, course } = useCourse();
@@ -50,6 +51,7 @@ export default function CoursePage() {
       {/* TAB CONTENT */}
       {activeTab === "dersim" && (
         <div className="course-tab-content">
+          <CourseLiveLectureCard />
           <CourseInfoSection />
           <CourseSyllabusSection />
           <CourseScheduleSection />

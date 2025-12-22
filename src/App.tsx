@@ -20,14 +20,21 @@ import UnpublishedLecturesPage from "./pages/Lectures/UnpublishedTab";
 import { CourseProvider } from "./contexts/CourseContext";
 import CoursePage from "./pages/Courses/CoursePage";
 import { useParams } from "react-router-dom";
+import { LiveLectureProvider } from "./contexts/LiveLectureContext";
+import LiveLecturePage from "./pages/Courses/LiveLecturePage";
 
-function CourseProviderWrapper() {
+function CourseRouteWrapper() {
   const { courseId } = useParams();
-  if (!courseId) return <div>Invalid course id</div>;
+
+  if (!courseId) {
+    return <div>Invalid course id</div>;
+  }
 
   return (
     <CourseProvider courseId={courseId}>
-      <CoursePage />
+      <LiveLectureProvider courseId={courseId}>
+        <Outlet />
+      </LiveLectureProvider>
     </CourseProvider>
   );
 }
@@ -57,8 +64,11 @@ function App() {
           <Route path="/my-lectures/unpublished" element={<UnpublishedLecturesPage />} />
           <Route path="/my-lectures/published" element={<PublishedLecturesPage />} />
 
-          {/* NEW COURSE PAGE ROUTE */}
-          <Route path="/course/:courseId" element={<CourseProviderWrapper />} />
+          {/* ✅ COURSE ROUTES */}
+          <Route path="/course/:courseId" element={<CourseRouteWrapper />}>
+            <Route index element={<CoursePage />} />
+            <Route path="live-lecture" element={<LiveLecturePage />} />
+          </Route>
 
           <Route path="/home" element={<Home />} />
           <Route path="/profile" element={<Profile />} />

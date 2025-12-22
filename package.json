@@ -10,10 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@zoom/videosdk": "^2.3.5",
+    "jsrsasign": "^11.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-icons": "^5.5.0",
-    "react-router-dom": "^7.9.6"
+    "react-router-dom": "^7.9.6",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

@@ -20,10 +20,14 @@ const DAY_LABELS: Record<number, string> = {
 };
 
 const TIME_SLOTS: string[] = [];
-for (let h = 7; h < 23; h++) {
+for (let h = 0; h < 24; h++) {
   const hour = h.toString().padStart(2, "0");
   TIME_SLOTS.push(`${hour}:00`);
+  TIME_SLOTS.push(`${hour}:15`);
   TIME_SLOTS.push(`${hour}:30`);
+  
+  
+  TIME_SLOTS.push(`${hour}:50`);
 }
 
 export default function CourseScheduleSection() {

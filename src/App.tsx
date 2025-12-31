@@ -22,6 +22,7 @@ import CoursePage from "./pages/Courses/CoursePage";
 import { useParams } from "react-router-dom";
 import { LiveLectureProvider } from "./contexts/LiveLectureContext";
 import LiveLecturePage from "./pages/Courses/LiveLecturePage";
+import { AnnouncementProvider } from "./contexts/Announcements/AnnouncementProvider";
 
 function CourseRouteWrapper() {
   const { courseId } = useParams();
@@ -32,9 +33,11 @@ function CourseRouteWrapper() {
 
   return (
     <CourseProvider courseId={courseId}>
-      <LiveLectureProvider courseId={courseId}>
-        <Outlet />
-      </LiveLectureProvider>
+      <AnnouncementProvider>
+        <LiveLectureProvider courseId={courseId}>
+          <Outlet />
+        </LiveLectureProvider>
+      </AnnouncementProvider>
     </CourseProvider>
   );
 }

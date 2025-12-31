@@ -9,10 +9,11 @@ import CourseScheduleSection from "./CourseScheduleSection";
 
 import "./course.css";
 import CourseLiveLectureCard from "../../components/lectures/CourseLiveLectureCard";
+import CourseAnnouncementsTab from "./CourseAnnouncementsTab";
 
 export default function CoursePage() {
   const { loading, course } = useCourse();
-  const [activeTab, setActiveTab] = useState<"dersim" | "materyaller" | "analiz">("dersim");
+  const [activeTab, setActiveTab] = useState<"dersim" | "materyaller" | "analiz"| "anons">("dersim");
 
   if (loading || !course) {
     return <div className="course-loading">Ders yükleniyor...</div>;
@@ -67,6 +68,11 @@ export default function CoursePage() {
       {activeTab === "analiz" && (
         <div className="course-analytics-placeholder">
           Kurs analizleri yakında eklenecek...
+        </div>
+      )}
+      {activeTab === "anons" && (
+        <div className="course-annnouncements-placeholder">
+          <CourseAnnouncementsTab/>
         </div>
       )}
     </div>

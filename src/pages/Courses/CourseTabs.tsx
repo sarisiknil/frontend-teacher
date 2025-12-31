@@ -9,6 +9,8 @@ export default function CourseTabs({ activeTab, setActiveTab }: Props) {
     { id: "dersim", label: "Dersim" },
     { id: "materyaller", label: "Materyaller" },
     { id: "analiz", label: "Kurs Analizi" },
+    { id: "anons", label: "Anonslarım" },
+
   ];
 
   return (

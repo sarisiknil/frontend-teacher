@@ -57,7 +57,7 @@ export const getCourseAnnouncements = (course_id: string, page: number, page_siz
 
 ) : Promise<ApiListResponse<CourseAnnouncements>> =>
   apiGet<ApiListResponse<CourseAnnouncements>>(
-    `api/course/course/announcements?course_id=${course_id}&page=${page}&page_size=${page_size}`,
+    `/api/course/course/announcements?course_id=${course_id}&page=${page}&page_size=${page_size}`,
     {},
     { requireAuth: true },
   );
@@ -66,7 +66,7 @@ export const getCourseAnnouncements = (course_id: string, page: number, page_siz
 export const getCourseAnnouncement = (announcement_id: string
 ) : Promise<ApiListResponse<Announcement>> =>
   apiGet<ApiListResponse<Announcement>>(
-    `api/course/course/announcements/item?announcement_id=${announcement_id}`,
+    `/api/course/course/announcements/item?announcement_id=${announcement_id}`,
     {},
     {requireAuth: true}
   );
@@ -76,7 +76,7 @@ export const postCreateAnnouncement = (payload: CreateAnnouncementPayload
 
 ) : Promise<ApiListResponse<Announcement>> => 
   apiPost<ApiListResponse<Announcement>>(
-    `api/course/course/announcements/create`,
+    `/api/course/course/announcements/create`,
     payload,
     {requireAuth: true},
   );

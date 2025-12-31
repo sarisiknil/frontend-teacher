@@ -123,7 +123,7 @@ export interface TeacherApprovalListResult {
 
 export const getProfile = async (profile_id: string): Promise<ProfileInfo> => {
   const res = await apiGet<any>(
-    "/api/course/profile",
+    "/api/course_profile/profile",
     { profile_id },
     { requireAuth: true }
   );
@@ -143,7 +143,7 @@ export const updateProfile = (
   payload: ProfileUpdateInput
 ): Promise<ProfileUpdateResult> =>
   apiPatch<{ items: ProfileUpdateResult[] }>(
-    "/api/course/profile/update",
+    "/api/course_profile/profile/update",
     payload,
     { requireAuth: true }
   ).then((r) => r.items[0]);
@@ -155,7 +155,7 @@ export const updateProfilePicture = async (
   form.append("file", file);
 
   const res = await apiPatchForm<{ items: ProfilePictureResult[] }>(
-    "/api/course/profile/picture",
+    "/api/course_profile/profile/picture",
     form,
     { requireAuth: true }
   );
@@ -167,7 +167,7 @@ export const getOverview = async (
   teacher_id: string
 ): Promise<TeacherOverview> => {
   const res = await apiGet<any>(
-    "/api/course/teacher/overview",
+    "/api/course_profile/teacher/overview",
     { teacher_id },
     { requireAuth: true }
   );
@@ -198,7 +198,7 @@ export const updateTeacher = (
   payload: TeacherUpdateInput
 ): Promise<TeacherUpdateResult> =>
   apiPatch<{ items: TeacherUpdateResult[] }>(
-    "/api/course/teacher/update",
+    "/api/course_profile/teacher/update",
     payload,
     { requireAuth: true }
   ).then((r) => r.items[0]);
@@ -208,7 +208,7 @@ export const changeTeacherSubbranches = (
   payload: TeacherSubbranchChangeInput
 ): Promise<TeacherSubbranchChangeResult> =>
   apiPatch<{ items: TeacherSubbranchChangeResult[] }>(
-    "/api/course/teacher/subbranches/change",
+    "/api/course_profile/teacher/subbranches/change",
     payload,
     { requireAuth: true }
   ).then((r) => r.items[0]);
@@ -219,7 +219,7 @@ export const getTeacherReviews = (
   page: number = 0
 ): Promise<TeacherReviews> =>
   apiGet<{ items: TeacherReviews[] }>(
-    "/api/course/teacher/reviews",
+    "/api/course_profile/teacher/reviews",
     { teacher_id, page },
     { requireAuth: true }
   ).then((r) => r.items[0]);
@@ -229,7 +229,7 @@ export const requestTeacherApproval = (
   applicant_comment: string
 ): Promise<TeacherApprovalRequestResult> =>
   apiPost<{ items: TeacherApprovalRequestResult[] }>(
-    "/api/course/teacher/approval/request",
+    "/api/course_profile/teacher/approval/request",
     { applicant_comment },
     { requireAuth: true }
   ).then((r) => r.items[0]);
@@ -238,7 +238,7 @@ export const getTeacherApprovals = async (
   teacher_id: string
 ): Promise<TeacherApproval[]> => {
   const res = await apiGet<{ items: TeacherApproval[] }>(
-      `/api/course/teacher/approvals/${teacher_id}`,
+      `/api/course_profile/teacher/approvals/${teacher_id}`,
       {},
       { requireAuth: true }
   );

@@ -59,3 +59,22 @@ export const postNotifyLiveLectureJoined = (
     {},
     { requireAuth: true }
   );
+
+export const postLeftSession = (
+  lesson_id: string
+): Promise<ApiListResponse<boolean>> =>
+  apiPost<ApiListResponse<boolean>>(
+    `/api/zoom/course/lesson/exit?lesson_id=${lesson_id}`,
+    {},
+    { requireAuth: true }
+  );
+
+
+export const postNotifyHeartbeat = (
+  lesson_id: string
+): Promise<ApiListResponse<boolean>> =>
+  apiPost<ApiListResponse<boolean>>(
+    `/api/zoom/course/lesson/heartbeat?lesson_id=${lesson_id}`,
+    {},
+    { requireAuth: true }
+  );

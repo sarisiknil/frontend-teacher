@@ -91,7 +91,7 @@ export function LiveLectureProvider({
 
     setLoading(true);
     try {
-      const res = await postCreateLesson(courseId, "Teacher started live lecture");
+      await postCreateLesson(courseId, "Teacher started live lecture");
       //console.log(res.items[0]);
       const tokenRes = await postGenerateJoinToken(courseId);
       //console.log(tokenRes);

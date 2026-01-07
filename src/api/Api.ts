@@ -316,3 +316,17 @@ export function apiDelete<T>(
     body: JSON.stringify(body),
   }, opts);
 }
+export function apiPostForm<T>(
+  path: string,
+  formData: FormData,
+  opts: { requireAuth?: boolean } = {}
+): Promise<T> {
+  return apiFetch<T>(
+    `${API_BASE}${path}`,
+    {
+      method: "POST",
+      body: formData,
+    },
+    opts
+  );
+}

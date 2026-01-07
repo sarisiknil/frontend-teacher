@@ -6,6 +6,7 @@ import CourseHero from "./CourseHero";
 import CourseInfoSection from "./CourseInfoSection";
 import CourseSyllabusSection from "./CourseSyllabusSection";
 import CourseScheduleSection from "./CourseScheduleSection";
+import TeacherMaterialsPage from "./MaterialsPage";
 
 import "./course.css";
 import CourseLiveLectureCard from "../../components/lectures/CourseLiveLectureCard";
@@ -60,7 +61,7 @@ export default function CoursePage() {
 
       {activeTab === "materyaller" && (
         <div className="course-materials-placeholder">
-          Materyaller yakında eklenecek...
+          <TeacherMaterialsPage />
         </div>
       )}
 

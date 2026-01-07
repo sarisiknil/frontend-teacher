@@ -1,0 +1,434 @@
+/* ===============================
+   Teacher Materials Page
+   =============================== */
+
+.teacher-materials-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Ubuntu, sans-serif;
+}
+
+/* ===============================
+   Header
+   =============================== */
+
+.teacher-materials-page h2 {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.teacher-materials-page h3 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* ===============================
+   Buttons (global inside page)
+   =============================== */
+
+.teacher-materials-page button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.teacher-materials-page button:hover {
+  background: #f5f5f5;
+}
+
+.teacher-materials-page button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===============================
+   Create Document Panel
+   =============================== */
+
+.create-doc-panel {
+  background: #fafafa;
+}
+
+.create-doc-panel label {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  gap: 4px;
+}
+
+.create-doc-panel input,
+.create-doc-panel select {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.create-doc-panel input:focus,
+.create-doc-panel select:focus {
+  outline: none;
+  border-color: #666;
+}
+
+/* ===============================
+   Document List
+   =============================== */
+
+.document-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.document-card {
+  background: #fff;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.document-card:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.doc-main strong {
+  font-size: 15px;
+}
+
+.doc-type {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ===============================
+   Document Meta
+   =============================== */
+
+.doc-meta {
+  font-size: 13px;
+  color: #555;
+}
+
+/* ===============================
+   Document Actions
+   =============================== */
+
+.doc-actions a {
+  color: #1a73e8;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.doc-actions a:hover {
+  text-decoration: underline;
+}
+
+.doc-actions button,
+.doc-actions label {
+  font-size: 13px;
+  border: 1px solid #ddd;
+  background: #fff;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.doc-actions label {
+  cursor: pointer;
+}
+
+.doc-actions button:hover,
+.doc-actions label:hover {
+  background: #f3f3f3;
+}
+
+/* ===============================
+   Homework Submissions
+   =============================== */
+
+.homework-submissions {
+  background: #fff;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+}
+
+.homework-submissions table {
+  width: 100%;
+  font-size: 14px;
+}
+
+.homework-submissions th {
+  font-weight: 600;
+  color: #444;
+}
+
+.homework-submissions td,
+.homework-submissions th {
+  text-align: left;
+}
+
+/* ===============================
+   Empty States
+   =============================== */
+
+.teacher-materials-page .empty {
+  opacity: 0.6;
+  padding: 16px;
+  text-align: center;
+}
+
+/* ===============================
+   Responsive
+   =============================== */
+
+@media (max-width: 768px) {
+  .teacher-materials-page {
+    padding: 16px;
+  }
+
+  .doc-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .doc-actions button,
+  .doc-actions label {
+    width: 100%;
+    text-align: center;
+  }
+}
+.tm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 9999;
+}
+
+.tm-modal {
+  width: min(720px, 100%);
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  box-shadow: 0 20px 70px rgba(0,0,0,0.18);
+  padding: 14px;
+}
+
+.tm-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.tm-icon-btn {
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 8px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.tm-error {
+  background: #fff2f2;
+  border: 1px solid #ffd0d0;
+  color: #b00020;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.tm-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.tm-form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.tm-span-2 {
+  grid-column: 1 / -1;
+}
+
+.tm-textarea {
+  min-height: 140px;
+  resize: vertical;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+}
+
+.tm-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+/* ---------- MODAL BACKDROP ---------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* ---------- MODAL CONTAINER ---------- */
+.modal {
+  background: #ffffff;
+  width: 100%;
+  max-width: 520px;
+  border-radius: 12px;
+  padding: 20px 22px;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+  animation: modal-fade-in 0.15s ease-out;
+}
+
+/* ---------- HEADER ---------- */
+.modal h3 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* ---------- FORM ---------- */
+.modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #374151;
+}
+
+.modal input,
+.modal select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.modal input:focus,
+.modal select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+/* ---------- ERROR ---------- */
+.modal-error {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* ---------- ACTIONS ---------- */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.modal-actions button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+/* Cancel */
+.modal-actions button:first-child {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.modal-actions button:first-child:hover {
+  background: #d1d5db;
+}
+
+/* Save */
+.modal-actions button:last-child {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.modal-actions button:last-child:hover {
+  background: #1d4ed8;
+}
+
+/* Disabled state */
+.modal-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ---------- ANIMATION ---------- */
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- MOBILE ---------- */
+@media (max-width: 520px) {
+  .modal {
+    margin: 0 12px;
+    padding: 16px;
+  }
+}
+.answers-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.answer-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.answer-row span {
+  width: 70px;
+  font-size: 13px;
+  color: #374151;
+}
+
+.answer-row select {
+  flex: 1;
+}

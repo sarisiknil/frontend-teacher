@@ -53,12 +53,23 @@ export function LiveLectureProvider({
   const [topic, setTopic] = useState<string| null>(null);
 
   const refreshStatus = useCallback(async () => {
+    console.log("[LiveLecture] refreshStatus()");
     setLoading(true);
+
     try {
       const res = await getLessonStatus(courseId);
-      setStatus(res.items[0] ?? null);
-      setTopic(res.meta!.lesson_id as string ?? null)
+      console.log("[LiveLecture] status response:", res);
+
+      const nextStatus = res.items[0] ?? "NO_ACTIVE_LESSON";
+      const nextTopic = res.meta?.lesson_id as string ?? null;
+
+      setStatus(nextStatus);
+      setTopic(nextTopic);
+
+      console.log("[LiveLecture] status:", nextStatus);
+      console.log("[LiveLecture] topic:", nextTopic);
     } catch (e: any) {
+      console.error("[LiveLecture] refreshStatus failed", e);
       setError(e.message);
     } finally {
       setLoading(false);
@@ -69,7 +80,7 @@ export function LiveLectureProvider({
     refreshStatus();
     const id = setInterval(refreshStatus, 30_000);
     return () => clearInterval(id);
-  }, [refreshStatus]);
+  }, [refreshStatus, courseId]);
 
   const canEnter =
     status === "ACTIVE_LESSON" ||
@@ -80,8 +91,8 @@ export function LiveLectureProvider({
 
     setLoading(true);
     try {
-      const res = await postCreateLesson(courseId, "Teacher started live lecture");
-      console.log(res.items[0]);
+      await postCreateLesson(courseId, "Teacher started live lecture");
+      //console.log(res.items[0]);
       const tokenRes = await postGenerateJoinToken(courseId);
       //console.log(tokenRes);
       const token = tokenRes.items[0].token;
@@ -89,7 +100,7 @@ export function LiveLectureProvider({
 
       const verify = await getVerifyLessonToken(token.toString());
       if (!verify.items[0]) throw new Error("Token verification failed");
-      
+      //console.log(verify)
       setZoomJWT(token.toString());
       navigate(`/course/${courseId}/live-lecture`);
     } catch (e: any) {

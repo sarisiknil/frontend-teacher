@@ -23,7 +23,7 @@ import { useParams } from "react-router-dom";
 import { LiveLectureProvider } from "./contexts/LiveLectureContext";
 import LiveLecturePage from "./pages/Courses/LiveLecturePage";
 import { AnnouncementProvider } from "./contexts/Announcements/AnnouncementProvider";
-
+import TeacherMaterialsLibraryPage from "./pages/TeacherMaterialsAllCourses";
 function CourseRouteWrapper() {
   const { courseId } = useParams();
 
@@ -63,6 +63,7 @@ function App() {
             </ProfileProvider>
           }
         >
+          <Route path="/materials" element={<TeacherMaterialsLibraryPage />} />
           <Route path="/my-lectures" element={<MyLecturesPage />} />
           <Route path="/my-lectures/unpublished" element={<UnpublishedLecturesPage />} />
           <Route path="/my-lectures/published" element={<PublishedLecturesPage />} />

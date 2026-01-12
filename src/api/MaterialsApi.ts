@@ -243,13 +243,18 @@ export type CourseDocumentDeleteRequest = {
 };
 
 export const deleteCourseDocument = (
-  payload: CourseDocumentDeleteRequest
+  course_id: string,
+  body: {
+    id?: string | null;
+    document_id?: string | null;
+  }
 ): Promise<ApiListResponse<null>> =>
   apiDelete<ApiListResponse<null>>(
-    "/api/course/course/documents",
-    payload,
+    `/api/course/course/documents?${new URLSearchParams({ course_id }).toString()}`,
+    body,
     { requireAuth: true }
   );
+
 export type CourseDocumentUpdateRequest = {
   /** Ownership context (REQUIRED) */
   course_id: string;

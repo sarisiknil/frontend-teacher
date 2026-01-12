@@ -52,25 +52,35 @@ export default function PublishedLecturesPage(){
 
     // Ders Başlatma (Kayıt Dönemi -> Devam Eden)
     async function handleStart(course: CourseRead) {
-        if(!teacherId) return;
-        
-        // Sadece PUBLISHED olanlar başlatılabilir (ONGOING olması için)
-        if(course.course_status !== "PUBLISHED"){
+        if (!teacherId) return;
+
+        if (course.course_status !== "PUBLISHED") {
             alert("Sadece 'Kayıt Dönemi'ndeki dersler başlatılabilir.");
             return;
         }
 
-        if(!confirm("Dersi başlatmak kayıtları kapatacaktır. Onaylıyor musunuz?")) return;
+        if (!confirm("Dersi başlatmak kayıtları kapatacaktır. Onaylıyor musunuz?")) return;
 
-        try {
-            await startCourse(course.course_id);
-            const res = await getCoursesByTeacher(teacherId);
-            setCourses(res.items);
-        } catch(err){
-            console.error("Başlatma hatası: ", err);
+        const res = await startCourse(course.course_id);
+
+        if (res.code === 422) {
+            if (res.errors?.[0]?.detail === "NO_STUDENTS_EXIST") {
+                alert(
+                    "Bu dersi başlatabilmek için en az 1 öğrenci kayıtlı olmalıdır.\n\n" +
+                    "Kayıt dönemi devam ederken öğrencilerin kayıt olmasını bekleyin."
+                );
+                return;
+            }
+
             alert("Ders başlatılamadı.");
+            return;
         }
+
+        // başarı
+        const refreshed = await getCoursesByTeacher(teacherId);
+        setCourses(refreshed.items);
     }
+
 
     // Ders İptali (Yayından Kaldırma)
     async function handleCancel(course: CourseRead) {

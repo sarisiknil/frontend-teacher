@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import type { CourseDocumentRead } from "../../api/MaterialsApi";
 import "./TeacherMaterials.css";
+import { getHomeworkByDocumentId } from "../../api/MaterialsApi";
 
 type Props = {
   doc: CourseDocumentRead;
   onClose: () => void;
   onSave: (payload: {
-    document_id: string;   // <-- CourseDocumentRead.id
+    document_id: string;   // ✅ MUST be CourseDocumentRead.id (row PK)
     question_count: number;
-    answers: string;       // <-- "ABCDE"
+    answers: string;       // e.g. "ABCDE"
   }) => Promise<void>;
 };
 
@@ -23,6 +24,8 @@ export default function HomeworkAnswersModal({
   const [choices, setChoices] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadingHomework, setLoadingHomework] = useState(true);
+
 
   /* ---------------- Sync choices with question count ---------------- */
 
@@ -38,6 +41,35 @@ export default function HomeworkAnswersModal({
       return next.slice(0, questionCount);
     });
   }, [questionCount]);
+
+  /* ---------------- Prefill if answers exist ---------------- */
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoadingHomework(true);
+
+    (async () => {
+      try {
+        const res = await getHomeworkByDocumentId(doc.id);
+
+        if (!cancelled && res.code === 200 && res.items.length > 0) {
+          const hw = res.items[0];
+          setQuestionCount(hw.question_count);
+          setChoices(hw.answers ? hw.answers.split("") : []);
+        }
+      } catch {
+        if (!cancelled) {
+          setError("Ödev cevapları yüklenemedi.");
+        }
+      } finally {
+        if (!cancelled) setLoadingHomework(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [doc.id]);
 
   /* ---------------- Save ---------------- */
 
@@ -59,14 +91,19 @@ export default function HomeworkAnswersModal({
       return;
     }
 
-    const answersString = choices.join(""); // <-- "ABCED"
+    const answersString = choices.join(""); // e.g. "ABCED"
+
+    if (answersString.length !== questionCount) {
+      setError("Cevap uzunluğu soru sayısı ile eşleşmiyor.");
+      return;
+    }
 
     setBusy(true);
     try {
       await onSave({
-        document_id: doc.id,           // 🔴 DOĞRU ID
+        document_id: doc.id,        // ✅ row PK, NOT document_id
         question_count: questionCount,
-        answers: answersString,        // 🔴 STRING
+        answers: answersString,
       });
 
       onClose();
@@ -76,35 +113,19 @@ export default function HomeworkAnswersModal({
       setBusy(false);
     }
   }
-  useEffect(() => {
-    if (!doc.homework_answers) return;
-
-    // assuming backend later returns these fields
-    if ((doc as any).question_count && (doc as any).answers) {
-        const qc = (doc as any).question_count;
-        const ans = (doc as any).answers as string;
-
-        setQuestionCount(qc);
-        setChoices(ans.split(""));
-    }
-    }, [doc]);
-
 
   /* ---------------- Render ---------------- */
 
   return (
     <div className="modal-backdrop">
       <div className="modal large">
-        <h3>
-          Ödev Cevapları – {doc.document_name}
-        </h3>
+        <h3>Ödev Cevapları – {doc.document_name}</h3>
 
-        {!doc.homework_answers && (
+        {!loadingHomework && questionCount === 0 && (
           <div className="modal-warning">
             ⚠️ Bu ödev için henüz cevaplar yüklenmemiş.
           </div>
         )}
-
         {error && <div className="modal-error">{error}</div>}
 
         <label>
@@ -114,6 +135,7 @@ export default function HomeworkAnswersModal({
             min={1}
             value={questionCount || ""}
             onChange={(e) => setQuestionCount(Number(e.target.value))}
+            disabled={busy}
           />
         </label>
 
@@ -124,6 +146,7 @@ export default function HomeworkAnswersModal({
                 <span>Soru {idx + 1}</span>
                 <select
                   value={choice}
+                  disabled={busy}
                   onChange={(e) => {
                     const v = e.target.value;
                     setChoices((prev) => {

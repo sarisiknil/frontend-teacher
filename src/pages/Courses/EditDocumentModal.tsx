@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { CourseDocumentRead } from "../../api/MaterialsApi";
 import "./TeacherMaterials.css";
+
 type Props = {
   doc: CourseDocumentRead;
   courseId: string;
@@ -9,8 +10,8 @@ type Props = {
     id: string;
     document_name?: string | null;
     description?: string | null;
-    document_type?: CourseDocumentRead["document_type"];
     week?: number | null;
+    // deadline is row-level but only meaningful for HOMEWORK in your product logic
     deadline?: string | null;
   }) => Promise<void>;
 };
@@ -19,7 +20,6 @@ export default function EditDocumentModal({ doc, onClose, onSave }: Props) {
   const [name, setName] = useState(doc.document_name);
   const [description, setDescription] = useState(doc.description ?? "");
   const [week, setWeek] = useState(doc.week?.toString() ?? "");
-  const [type, setType] = useState(doc.document_type);
   const [deadline, setDeadline] = useState(
     doc.deadline ? doc.deadline.slice(0, 16) : ""
   );
@@ -36,12 +36,16 @@ export default function EditDocumentModal({ doc, onClose, onSave }: Props) {
     setBusy(true);
     try {
       await onSave({
-        id: doc.id, 
+        id: doc.id,
         document_name: name.trim(),
         description: description.trim() || null,
-        document_type: type,
         week: week ? Number(week) : null,
-        deadline: deadline ? new Date(deadline).toISOString() : null,
+
+        // ✅ only send deadline if HOMEWORK, else null
+        deadline:
+          doc.document_type === "HOMEWORK" && deadline
+            ? new Date(deadline).toISOString()
+            : null,
       });
       onClose();
     } catch (e: any) {
@@ -71,16 +75,10 @@ export default function EditDocumentModal({ doc, onClose, onSave }: Props) {
           />
         </label>
 
+        {/* ✅ Type is informational here (shared) */}
         <label>
           Tür
-          <select value={type} onChange={(e) => setType(e.target.value as any)}>
-            <option value="HOMEWORK">HOMEWORK</option>
-            <option value="SUMMARY">SUMMARY</option>
-            <option value="LECTURE_NOTES">LECTURE_NOTES</option>
-            <option value="READING">READING</option>
-            <option value="SOLUTION">SOLUTION</option>
-            <option value="OTHER">OTHER</option>
-          </select>
+          <input value={doc.document_type} disabled />
         </label>
 
         <label>
@@ -93,14 +91,17 @@ export default function EditDocumentModal({ doc, onClose, onSave }: Props) {
           />
         </label>
 
-        <label>
-          Deadline
-          <input
-            type="datetime-local"
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
-          />
-        </label>
+        {/* ✅ Deadline only for HOMEWORK */}
+        {doc.document_type === "HOMEWORK" && (
+          <label>
+            Deadline (Ödev için)
+            <input
+              type="datetime-local"
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
+            />
+          </label>
+        )}
 
         <div className="modal-actions">
           <button onClick={onClose} disabled={busy}>

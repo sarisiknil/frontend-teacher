@@ -20,7 +20,7 @@ import EditDocumentModal from "./EditDocumentModal";
 import HomeworkAnswersModal from "./HomeworkAnswersModal";
 
 type DocType = CourseDocumentRead["document_type"];
-
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 export default function TeacherMaterialsPage() {
   const { course } = useCourse();
   const courseId = course?.course_id;
@@ -36,25 +36,24 @@ export default function TeacherMaterialsPage() {
   const [newDocType, setNewDocType] = useState<DocType>("LECTURE_NOTES");
   const [newDocName, setNewDocName] = useState("");
   const [newDescription, setNewDescription] = useState("");
-  const [newWeek, setNewWeek] = useState<string>(""); // keep as string for input
-  const [newVisibleFrom, setNewVisibleFrom] = useState<string>(""); // datetime-local value
-  const [newDeadline, setNewDeadline] = useState<string>(""); // datetime-local value
+  const [newWeek, setNewWeek] = useState<string>("");
+  const [newVisibleFrom, setNewVisibleFrom] = useState<string>("");
+  const [newDeadline, setNewDeadline] = useState<string>(""); // only for HOMEWORK
   const [newFile, setNewFile] = useState<File | null>(null);
 
   const [editDoc, setEditDoc] = useState<CourseDocumentRead | null>(null);
   const [editHomework, setEditHomework] = useState<CourseDocumentRead | null>(null);
 
-
-  
-
   useEffect(() => {
     if (!courseId) return;
     loadDocuments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId]);
 
   async function loadDocuments() {
+    if (!courseId) return;
     setLoading(true);
-    const res = await getCourseDocuments(courseId!);
+    const res = await getCourseDocuments(courseId);
     if (res.code === 200) {
       setDocuments(res.items.filter((d) => !d.deleted_at));
     }
@@ -73,25 +72,21 @@ export default function TeacherMaterialsPage() {
   /* ------------------ DOCUMENT ACTIONS ------------------ */
 
   async function handleDelete(doc: CourseDocumentRead) {
-    if (!confirm("Bu belge silinsin mi?")) return;
+    if (!courseId) return;
+    if (!confirm("Bu belge silinsin mi? (Sadece bu kursta silinecek)")) return;
 
-    await deleteCourseDocument({
-      course_id: courseId!,
-      document_id: doc.document_id,
-    });
+    // ✅ course-specific delete -> use row PK (id)
+    await deleteCourseDocument(courseId, { id: doc.id });
 
-    loadDocuments();
+    await loadDocuments();
   }
 
-
   async function handleReplaceFile(doc: CourseDocumentRead, file: File) {
-    await updateCourseDocumentFile(
-      courseId!,
-      doc.document_id,
-      file
-    );
+    if (!courseId) return;
 
-    loadDocuments();
+    // ✅ shared file replacement -> uses shared document_id
+    await updateCourseDocumentFile(courseId, doc.document_id, file);
+    await loadDocuments();
   }
 
   /* ------------------ CREATE DOCUMENT (UPLOAD) ------------------ */
@@ -107,10 +102,7 @@ export default function TeacherMaterialsPage() {
     setCreateError(null);
   }
 
-  // helper: convert <input type="datetime-local"> value to ISO string
   function dtLocalToIso(dtLocal: string): string {
-    // dtLocal like "2025-12-26T21:23"
-    // new Date(dtLocal) interprets as local time, then toISOString() converts to UTC ISO
     return new Date(dtLocal).toISOString();
   }
 
@@ -118,13 +110,13 @@ export default function TeacherMaterialsPage() {
     if (!courseId) return;
     setCreateError(null);
 
-    if (!newFile) {
-      setCreateError("Lütfen bir dosya seçin.");
-      return;
-    }
-    if (!newDocName.trim()) {
-      setCreateError("Lütfen belge adı girin.");
-      return;
+    if (!newFile) return setCreateError("Lütfen bir dosya seçin.");
+    if (!newDocName.trim()) return setCreateError("Lütfen belge adı girin.");
+
+    // deadline only for homework
+    if (newDocType !== "HOMEWORK") {
+      // keep it empty
+      if (newDeadline) setNewDeadline("");
     }
 
     setCreateBusy(true);
@@ -134,21 +126,38 @@ export default function TeacherMaterialsPage() {
         document_type: newDocType,
         document_name: newDocName.trim(),
         file: newFile,
-        // optional fields below
+
         description: newDescription.trim() ? newDescription.trim() : null,
         week: newWeek.trim() ? Number(newWeek) : null,
-        visible_from: newVisibleFrom ? dtLocalToIso(newVisibleFrom) : null,
-        deadline: newDeadline ? dtLocalToIso(newDeadline) : null,
+
+        // ✅ only send deadline when HOMEWORK
+        deadline:
+          newDocType === "HOMEWORK" && newDeadline
+            ? dtLocalToIso(newDeadline)
+            : null,
+            visible_from:
+        newDocType === "HOMEWORK" && newVisibleFrom
+          ? dtLocalToIso(newVisibleFrom)
+          : null,
       };
 
       const res = await createCourseDocument(payload);
 
       if (res.code !== 200) {
         setCreateError(res.message || "Belge yüklenemedi.");
-      } else {
-        resetCreateForm();
-        setShowCreate(false);
-        await loadDocuments();
+        return;
+      }
+
+      // created document is res.items[0] (single upload)
+      const created = res.items?.[0];
+
+      resetCreateForm();
+      setShowCreate(false);
+      await loadDocuments();
+
+      // ✅ If HOMEWORK: immediately open answers modal to upsert answers
+      if (created && created.document_type === "HOMEWORK") {
+        setEditHomework(created);
       }
     } catch (e: any) {
       setCreateError(e?.message || "Belge yüklenemedi.");
@@ -157,9 +166,15 @@ export default function TeacherMaterialsPage() {
     }
   }
 
-
-
   /* ------------------ RENDER ------------------ */
+  const DOC_TYPE_LABELS: Record<DocType, string> = {
+    HOMEWORK: "Ödev",
+    SUMMARY: "Özet",
+    LECTURE_NOTES: "Ders Notu",
+    READING: "Okuma",
+    SOLUTION: "Çözüm",
+    OTHER: "Diğer",
+  };
 
   if (loading) return <div>Materyaller yükleniyor...</div>;
 
@@ -175,7 +190,15 @@ export default function TeacherMaterialsPage() {
 
       {/* -------- CREATE DOCUMENT PANEL -------- */}
       {showCreate && (
-        <div className="create-doc-panel" style={{ marginTop: 12, padding: 12, border: "1px solid #ddd", borderRadius: 8 }}>
+        <div
+          className="create-doc-panel"
+          style={{
+            marginTop: 12,
+            padding: 12,
+            border: "1px solid #ddd",
+            borderRadius: 8,
+          }}
+        >
           <h3 style={{ marginTop: 0 }}>Yeni Belge Yükle</h3>
 
           {createError && (
@@ -184,20 +207,24 @@ export default function TeacherMaterialsPage() {
             </div>
           )}
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 10,
+            }}
+          >
             <label>
               Belge Türü
               <select
                 value={newDocType}
                 onChange={(e) => setNewDocType(e.target.value as DocType)}
-                style={{ width: "100%" }}
               >
-                <option value="HOMEWORK">HOMEWORK</option>
-                <option value="SUMMARY">SUMMARY</option>
-                <option value="LECTURE_NOTES">LECTURE_NOTES</option>
-                <option value="READING">READING</option>
-                <option value="SOLUTION">SOLUTION</option>
-                <option value="OTHER">OTHER</option>
+                {Object.entries(DOC_TYPE_LABELS).map(([k, v]) => (
+                  <option key={k} value={k}>
+                    {v}
+                  </option>
+                ))}
               </select>
             </label>
 
@@ -233,27 +260,32 @@ export default function TeacherMaterialsPage() {
               />
             </label>
 
-            <label>
-              Görünürlük (opsiyonel)
-              <input
-                type="datetime-local"
-                value={newVisibleFrom}
-                onChange={(e) => setNewVisibleFrom(e.target.value)}
-                style={{ width: "100%" }}
-              />
-            </label>
+            {newDocType === "HOMEWORK" && (
+              <label>
+                Görünürlük (Ödev için)
+                <input
+                  type="datetime-local"
+                  value={newVisibleFrom}
+                  onChange={(e) => setNewVisibleFrom(e.target.value)}
+                  style={{ width: "100%" }}
+                />
+              </label>
+            )}
 
-            <label>
-              Deadline (opsiyonel)
-              <input
-                type="datetime-local"
-                value={newDeadline}
-                onChange={(e) => setNewDeadline(e.target.value)}
-                style={{ width: "100%" }}
-              />
-            </label>
+            {/* ✅ Deadline only for HOMEWORK */}
+            {newDocType === "HOMEWORK" && (
+              <label>
+                Deadline (Ödev için)
+                <input
+                  type="datetime-local"
+                  value={newDeadline}
+                  onChange={(e) => setNewDeadline(e.target.value)}
+                  style={{ width: "100%" }}
+                />
+              </label>
+            )}
 
-            <label>
+            <label style={{ gridColumn: "1 / -1" }}>
               Dosya
               <input
                 type="file"
@@ -284,27 +316,77 @@ export default function TeacherMaterialsPage() {
       {/* -------- DOCUMENT LIST -------- */}
       <div className="document-list" style={{ marginTop: 16 }}>
         {sortedDocs.map((doc) => (
-          <div key={doc.id} className="document-card" style={{ padding: 12, border: "1px solid #eee", borderRadius: 8, marginBottom: 10 }}>
-            <div className="doc-main" style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+          <div
+            key={doc.id}
+            className="document-card"
+            style={{
+              padding: 12,
+              border: "1px solid #eee",
+              borderRadius: 8,
+              marginBottom: 10,
+            }}
+          >
+            <div
+              className="doc-main"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: 10,
+              }}
+            >
               <strong>{doc.document_name}</strong>
-              <span className="doc-type" style={{ opacity: 0.7 }}>{doc.document_type}</span>
-            </div>
-
-            <div className="doc-meta" style={{ display: "flex", gap: 12, marginTop: 6, opacity: 0.8, flexWrap: "wrap" }}>
-              {doc.week && <span>Hafta {doc.week}</span>}
-              {doc.deadline && (
-                <span>
-                  Son teslim:{" "}
-                  {new Date(doc.deadline).toLocaleDateString("tr-TR")}
-                </span>
-              )}
-              <span>
-                {(doc.file_size_bytes / 1024 / 1024).toFixed(1)} MB · {doc.mime_type}
+              <span className="doc-type" style={{ opacity: 0.7 }}>
+                {doc.document_type}
               </span>
             </div>
 
-            <div className="doc-actions" style={{ display: "flex", gap: 10, marginTop: 10, flexWrap: "wrap" }}>
-              <a href={doc.document_link} target="_blank" rel="noreferrer">
+            <div
+              className="doc-meta"
+              style={{
+                display: "flex",
+                gap: 12,
+                marginTop: 6,
+                opacity: 0.8,
+                flexWrap: "wrap",
+              }}
+            >
+              {doc.week && <span>Hafta {doc.week}</span>}
+
+              {/* ✅ Deadline only for HOMEWORK */}
+              {doc.document_type === "HOMEWORK" && doc.deadline && (
+                <span>
+                  Son teslim:{" "}
+                  {new Date(doc.deadline).toLocaleString("tr-TR")}
+                </span>
+              )}
+
+              <span>
+                {(doc.file_size_bytes / 1024 / 1024).toFixed(1)} MB ·{" "}
+                {doc.mime_type}
+              </span>
+
+              {/* ✅ Encourage answers if missing */}
+              {doc.document_type === "HOMEWORK" && doc.homework_answers === false && (
+                <span style={{ color: "crimson", fontWeight: 600 }}>
+                  Cevaplar yüklenmedi!
+                </span>
+              )}
+            </div>
+
+            <div
+              className="doc-actions"
+              style={{
+                display: "flex",
+                gap: 10,
+                marginTop: 10,
+                flexWrap: "wrap",
+              }}
+            >
+              <a
+                href={`${API_BASE}/${doc.document_link}`}
+                target="_blank"
+                rel="noreferrer"
+              >
                 İndir
               </a>
 
@@ -324,12 +406,9 @@ export default function TeacherMaterialsPage() {
               <button onClick={() => handleDelete(doc)}>Sil</button>
 
               {doc.document_type === "HOMEWORK" && (
-                <>
-                  <button onClick={() => setEditHomework(doc)}>
-                    Cevapları Düzenle
-                  </button>
-
-                </>
+                <button onClick={() => setEditHomework(doc)}>
+                  Cevapları Düzenle
+                </button>
               )}
             </div>
           </div>
@@ -346,39 +425,45 @@ export default function TeacherMaterialsPage() {
           courseId={courseId!}
           onClose={() => setEditDoc(null)}
           onSave={async (payload) => {
+            // ✅ row-only update via id
             await updateCourseDocument(courseId!, payload);
             await loadDocuments();
           }}
         />
       )}
+
       {editHomework && (
         <HomeworkAnswersModal
           doc={editHomework}
           onClose={() => setEditHomework(null)}
-          onSave={async ({ document_id: rowId, question_count, answers }) => {
-            const res = await upsertHomework({
+          onSave={async ({ document_id, question_count, answers }) => {
+            await upsertHomework({
               course_id: courseId!,
-              document_id: rowId,
+              document_id,
               question_count,
               answers,
             });
 
+            // ✅ KRİTİK: parent documents state’ini güncelle
             setDocuments((prev) =>
               prev.map((d) =>
-                d.id === rowId
+                d.id === document_id
                   ? { ...d, homework_answers: true }
                   : d
               )
             );
 
+            // editHomework state’ini de senkron tut
+            setEditHomework((prev) =>
+              prev && prev.id === document_id
+                ? { ...prev, homework_answers: true }
+                : prev
+            );
+
             setEditHomework(null);
           }}
-
-
         />
-
       )}
-
 
     </div>
   );

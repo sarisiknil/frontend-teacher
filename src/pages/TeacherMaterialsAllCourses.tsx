@@ -11,6 +11,7 @@ import {
 import type { CourseDocumentRead } from "../api/MaterialsApi";
 
 import "./TeacherMaterialsLibraryPage.css";
+import TeacherHomeworkSubmissionsModal from "./TeacherHomeworkSubmissionsModal";
 
 /* ---------------- Types ---------------- */
 
@@ -90,6 +91,12 @@ export default function TeacherMaterialsLibraryPage() {
 
   const [materials, setMaterials] = useState<SharedMaterial[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeHomework, setActiveHomework] = useState<{
+    course_id: string;
+    document_id: string;
+    document_name: string;
+  } | null>(null);
+
 
   useEffect(() => {
     if (!teacherId) return;
@@ -228,16 +235,41 @@ export default function TeacherMaterialsLibraryPage() {
 
             {/* --- Card Footer --- */}
             <div className="card-footer">
+              {mat.document_type === "HOMEWORK" && (
+                <button
+                  className="btn-secondary"
+                  onClick={() =>
+                    setActiveHomework({
+                      course_id: mat.used_in_courses[0].course_id,
+                      document_id: mat.used_in_courses[0].row_id,
+                      document_name: mat.document_name,
+                    })
+                  }
+                >
+                  📊 Teslimleri Gör
+                </button>
+              )}
+
               <button
                 className="btn-delete-global"
                 onClick={() => handleDeleteEverywhere(mat)}
               >
-                 Tümünden Sil
+                Tümünden Sil
               </button>
             </div>
+
           </article>
         ))}
       </div>
+      {activeHomework && (
+        <TeacherHomeworkSubmissionsModal
+          course_id={activeHomework.course_id}
+          document_id={activeHomework.document_id}
+          document_name={activeHomework.document_name}
+          onClose={() => setActiveHomework(null)}
+        />
+      )}
+
     </div>
   );
 }

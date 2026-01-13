@@ -1,0 +1,84 @@
+.thsm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.thsm-modal {
+  background: #fff;
+  width: 90%;
+  max-width: 1100px;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+.thsm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  border-bottom: 1px solid #eee;
+}
+
+.thsm-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.thsm-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.thsm-loading,
+.thsm-empty {
+  padding: 40px;
+  text-align: center;
+  color: #666;
+}
+
+.thsm-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.thsm-table th,
+.thsm-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: left;
+  font-size: 14px;
+}
+
+.thsm-table th {
+  background: #fafafa;
+  font-weight: 600;
+}
+
+.mono {
+  font-family: monospace;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge.success {
+  background: #e7f7ef;
+  color: #0f7a45;
+}
+
+.badge.muted {
+  background: #eee;
+  color: #666;
+}
